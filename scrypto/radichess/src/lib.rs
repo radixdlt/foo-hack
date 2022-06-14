@@ -17,31 +17,26 @@ impl RadiChessUser {
 
 blueprint! {
     struct RadiChess {
-        // Define what resources and data will be managed by Hello components
         service_auth: Vault,
         user_vault: Vault
     }
 
     impl RadiChess {
-        // Implement the functions and methods which will manage those resources and data
-        
-        // This is a function, and can be called directly on the blueprint once deployed
         pub fn create() -> ComponentAddress {
             let service_auth: Bucket = ResourceBuilder::new_fungible()
                 .initial_supply(1);
             // Create a new token called "HelloToken," with a fixed supply of 1000, and put that supply into a bucket
-            let radi_chess_user: Bucket = ResourceBuilder::new_fungible()
-                .metadata("name", "RadiChess")
-                .metadata("symbol", "RC")
+            let radi_chess_user = ResourceBuilder::new_fungible()
+                .metadata("name", "RadiChess Player")
+                .metadata("symbol", "RCP")
                 .mintable(rule!(require(service_auth.resource_address())), Mutability::LOCKED)
                 .burnable(rule!(require(service_auth.resource_address())), Mutability::LOCKED)
-                .initial_supply(1000);
+                .no_initial_supply();
 
             let access_rules = AccessRules::new().default(AccessRule::AllowAll);
 
-            // Instantiate a Hello component, populating its vault with our supply of 1000 HelloToken
             Self {
-                user_vault: Vault::with_bucket(radi_chess_user),
+                user_vault: Vault::new(radi_chess_user),
                 service_auth: Vault::with_bucket(service_auth)
             }
             .instantiate()
@@ -49,7 +44,7 @@ blueprint! {
             .globalize()
         }
 
-        pub fn register_user(&self, name: String, elo: u64) -> Bucket {
+        pub fn register_player(&self, name: String, elo: u64) -> Bucket {
             self.service_auth.authorize(|| {
                 let user_id = self.user_vault.non_fungible_ids().len() + 1;
                 borrow_resource_manager!(self.user_vault.resource_address()).mint_non_fungible(&NonFungibleId::from_u64(user_id as u64), RadiChessUser::new(name, elo))

@@ -3,7 +3,7 @@ use scrypto::prelude::*;
 use serde::Serialize;
 
 #[derive(Debug, NonFungibleData)]
-struct RadiChessUser {
+pub struct RadiChessUser {
     name: String,
     elo: u64,
 }
@@ -103,7 +103,7 @@ blueprint! {
             );
             // Now create the game and return the game component address
             let player_id = badge.non_fungible::<RadiChessUser>().id();
-            let component = Chess::instantiate(player_id);
+            let component = Chess::instantiate(player_id, self.user_resource);
 
             self.games.push(component);
 

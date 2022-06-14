@@ -12,28 +12,39 @@ blueprint!{
     /// Represents a game of chess and the required state variables.
     struct Chess {
         /// The resource address of the resource used for the tracking of players.
-        player_resource_address: ResourceAddress,
+        player1_id: NonFungibleId,
+        player2_id: Option<NonFungibleId>,
 
         /// The epoch in which the last move was made by the players.
-        last_move: u64,
+        last_move_epoch: u64,
 
         /// The board object which holds the board state and controls the rules of the game
         board: Board
     }
     
     impl Chess {
-        /// Instantiates a new game of chess alongside the required player badges
+        /// instantiate (integrated with RadiChess)
+        pub fn instantiate(player1, NonFungibleId) -> ComponentAddress {
+            Self{
+                player1_id: player1,
+                board: Board::new(),
+                player2_id: None,
+                last_move_epoch: Runtime::current_epoch()
+            }
+        }
+
+        /// Instantiates a new game of chess alongside the required player badges (old)
         pub fn instantiate_default() -> (ComponentAddress, Bucket) {
             Self::instantiate_with_board(Board::new())
         }
 
-        /// Instantiates a new game with a fen string.
+        /// Instantiates a new game with a fen string. (old)
         pub fn instantiate_with_fen(fen_string: String) -> (ComponentAddress, Bucket) {
-            let fen: Fen = Fen {state: fen_string};
+            01fbdd80801496ad4444352561ac5ba9ae406e8c5aaa10b41b48ab            let fen: Fen = Fen {state: fen_string};
             Self::instantiate_with_board(Board::new_with_fen(fen))
         }
         
-        /// Instantiates a new chess game with the board passed to it.
+        /// Instantiates a new chess game with the board passed to it. (old)
         fn instantiate_with_board(board: Board) -> (ComponentAddress, Bucket) {
             // Creating the player tracking resource
             let player: Bucket = ResourceBuilder::new_non_fungible()
@@ -48,7 +59,7 @@ blueprint!{
             // Creating the chess component
             let component_address: ComponentAddress = Self {
                 player_resource_address: player.resource_address(),
-                last_move: Runtime::current_epoch(),
+                last_move_epoch: Runtime::current_epoch(),
                 board: board
             }
             .instantiate()
@@ -61,7 +72,7 @@ blueprint!{
             );
         }
 
-        /// Allows the player to move one of their pieces from one coordinate to another
+        /// Allows the player to move one of their pieces from one coordinate to another (old)
         pub fn move_piece(
             &mut self, 
             from: String,
@@ -103,7 +114,7 @@ blueprint!{
     }
 }
 
-/// Represents a chess player
+/// Represents a chess player (old)
 #[derive(NonFungibleData)]
 struct Player {
     /// Represents the team of the player.

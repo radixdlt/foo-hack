@@ -55,6 +55,14 @@ blueprint! {
             })
         }
 
+        pub fn start_game(&self, badge: Proof) -> ComponentAddress {
+            // Check the Badge to make sure this is a chess player
+            assert!(badge.resource_address() == self.user_vault.resource_address(), "Invalid Player Badge");
+            // Now create the game and return the game component address
+            let player_id = player.non_fungible::<RadiChessUser>().id();
+            Chess::instantiate_default(player_id)
+        }
+
         // This is a method, because it needs a reference to self.  Methods can only be called on components
         // pub fn free_token(&mut self) -> Bucket {
         //     info!("My balance is: {} HelloToken. Now giving away a token!", self.sample_vault.amount());

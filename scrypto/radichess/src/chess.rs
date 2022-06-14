@@ -2,6 +2,7 @@
 //! 1. Add a way for the game to end if one of the players takes too long to make a move.
 
 use scrypto::prelude::*;
+use serde::Serialize;
 use crate::{
     coordinate::Coordinate,
     board::{Board, Fen}, 
@@ -10,12 +11,20 @@ use crate::{
 };
 
 
-// Represents a chess player (old)
-// #[derive(NonFungibleData)]
-// struct Player {
-//    // Represents the team of the player.
-//    team: Team
-// };
+#[derive(Debug, Describe, Encode, Decode, TypeId, Serialize)]
+pub enum Status {
+    Awaiting,
+    InProgress,
+    Finished
+}
+
+#[derive(Debug, Describe, Encode, Decode, TypeId, Serialize)]
+pub enum Outcome {
+    Winner(String),
+    Draw,
+    Undecided
+}
+
 
 blueprint!{
     // Represents a game of chess and the required state variables.
@@ -24,6 +33,8 @@ blueprint!{
         badge_resource: ResourceAddress,
         player1_id: NonFungibleId,
         player2_id: Option<NonFungibleId>,
+        player1_team: Team,
+        player2_team: Option<Team>,
         underway: bool,
         completed: bool,
 
@@ -37,15 +48,18 @@ blueprint!{
     impl Chess {
         /// instantiate (integrated with RadiChess)
 
-        pub fn instantiate(player1: NonFungibleId, badgeRA: ResourceAddress)
+        pub fn instantiate(player1: NonFungibleId, badge_resource: ResourceAddress)
         -> ComponentAddress {
             let access_rules = AccessRules::new().default(AccessRule::AllowAll);
 
             Self {
-                badge_resource: badgeRA,
+                badge_resource,
                 player1_id: player1,
+                player1_team: Team::Black,
                 board: Board::new(),
                 player2_id: None,
+                player2_team: None,
+
                 last_move_epoch: Runtime::current_epoch(),
                 underway: false,
                 completed: false
@@ -62,5 +76,36 @@ blueprint!{
             self.underway = true;
             self.last_move_epoch = Runtime::current_epoch()
         }
+
+        pub fn get_players(&self) -> (NonFungibleId, Option<NonFungibleId>) {
+            (self.player1_id.clone(), self.player2_id.clone())
+        }
+
+        pub fn get_status(&self) -> Status {
+            if self.player2_id.is_none() {
+                Status::Awaiting
+            } else if self.board.winner().is_some() {
+                Status::Finished
+            } else {
+                Status::InProgress
+            }
+        }
+
+        pub fn get_outcome(&self) -> Outcome { 
+            if self.board.winner().is_some() {
+                Outcome::Winner(self.get_player())
+            } else {
+                Outcome::Undecided
+            } 
+        }
+
+        fn get_player(&self) -> String {
+            if self.player1_team == self.board.winner().unwrap() {
+                self.player1_id.to_string()
+            } else {
+                self.player2_id.clone().unwrap().to_string()
+            }
+        }
+
     }
 }

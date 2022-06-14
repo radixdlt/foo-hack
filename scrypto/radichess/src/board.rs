@@ -1,10 +1,10 @@
 use crate::coordinate::{Coordinate, CoordinatePath};
 use crate::piece::{Piece, PieceClass, Team};
-use std::collections::HashMap;
 use itertools::Itertools;
 use regex::Regex;
 use sbor::Decode;
 use scrypto::prelude::*;
+use std::collections::HashMap;
 
 /// Represents the current chess board with all of its pieces
 #[derive(Debug, Encode, Decode, TypeId, Describe)]
@@ -22,7 +22,7 @@ pub struct Board {
     history: Vec<HistoryNode>,
 
     /// Represents the team which has the turn to play.
-    turn_to_play: Team
+    turn_to_play: Team,
 }
 
 impl Board {
@@ -73,12 +73,18 @@ impl Board {
             for char in row_data.chars() {
                 if char.is_alphabetic() {
                     let piece: Piece = Piece::try_from(char).unwrap();
-                    board.set_piece(&Coordinate::try_from((row_index, column_index)).unwrap(), Some(piece));
+                    board.set_piece(
+                        &Coordinate::try_from((row_index, column_index)).unwrap(),
+                        Some(piece),
+                    );
                     column_index += 1;
                 } else if char.is_numeric() {
                     let amount: u32 = char.to_digit(10).unwrap();
                     for _ in 0..amount {
-                        board.set_piece(&Coordinate::try_from((row_index, column_index)).unwrap(), None);
+                        board.set_piece(
+                            &Coordinate::try_from((row_index, column_index)).unwrap(),
+                            None,
+                        );
                         column_index += 1;
                     }
                 } else {
@@ -91,7 +97,7 @@ impl Board {
             board.toggle_turn_to_play();
         }
 
-        return board
+        return board;
     }
 
     pub fn try_new_with_history(history: Vec<HistoryNode>) -> Result<Self, BoardError> {
@@ -102,7 +108,7 @@ impl Board {
         }
 
         Ok(board)
-    } 
+    }
 
     fn remove_piece(&mut self, coordinate: &Coordinate) -> Result<(), BoardError> {
         let piece: Option<Piece> = self.get_piece(coordinate);
@@ -144,24 +150,20 @@ impl Board {
     fn toggle_turn_to_play(&mut self) {
         self.turn_to_play = match self.turn_to_play {
             Team::White => Team::Black,
-            Team::Black => Team::White
+            Team::Black => Team::White,
         }
     }
 
     pub fn team_at_coordinate(&self, coordinate: &Coordinate) -> Option<Team> {
         match self.get_piece(coordinate) {
             Some(piece) => Some(piece.team()),
-            None => None
+            None => None,
         }
     }
 
-    /// Moves a piece from one coordinate to another coordinate. Checks that the move is legal before performing the 
+    /// Moves a piece from one coordinate to another coordinate. Checks that the move is legal before performing the
     /// move.
-    pub fn move_piece(
-        &mut self,
-        from: &Coordinate,
-        to: &Coordinate
-    ) -> Result<(), BoardError> {
+    pub fn move_piece(&mut self, from: &Coordinate, to: &Coordinate) -> Result<(), BoardError> {
         // Getting the piece at the specified coordinate.
         let mut piece: Piece = {
             match self.get_piece(from) {
@@ -172,11 +174,12 @@ impl Board {
 
         // Check if this piece is of the team that is currently allowed to play, if not then return an error
         if piece.team() != self.turn_to_play {
-            return Err(BoardError::NotYourTurn)
+            return Err(BoardError::NotYourTurn);
         }
 
         // Getting all of the legal moves for this piece
-        let legal_moves: HashMap<Coordinate, Option<Coordinate>> = self.piece_legal_moves(from).unwrap();
+        let legal_moves: HashMap<Coordinate, Option<Coordinate>> =
+            self.piece_legal_moves(from).unwrap();
 
         // If true, then this is a legal move and we can go ahead with the removal of the old item.
         if legal_moves.contains_key(to) {
@@ -184,7 +187,7 @@ impl Board {
             match legal_moves.get(from) {
                 Some(to_destroy_coordinate) => {
                     self.remove_piece(&to_destroy_coordinate.unwrap())?;
-                },
+                }
                 None => {}
             }
 
@@ -197,7 +200,11 @@ impl Board {
             *self.team_moves.get_mut(&piece.team()).unwrap() += 1;
 
             // Adding the move to the history of the match
-            self.history.push(HistoryNode { piece: piece, from: from.clone(), to: to.clone() });
+            self.history.push(HistoryNode {
+                piece: piece,
+                from: from.clone(),
+                to: to.clone(),
+            });
 
             // Toggle the teams
             self.toggle_turn_to_play();
@@ -434,13 +441,11 @@ impl Board {
                 // Single pawn move
                 let mut is_single_move_legal: bool = false;
                 match coordinate.checked_add_individual(single_pawn_move, 0) {
-                    Ok(single_coordinate) => {
-                        match self.get_piece(&single_coordinate) {
-                            Some(_) => { }
-                            None => {
-                                legal_moves.insert(single_coordinate, None);
-                                is_single_move_legal = true;
-                            }
+                    Ok(single_coordinate) => match self.get_piece(&single_coordinate) {
+                        Some(_) => {}
+                        None => {
+                            legal_moves.insert(single_coordinate, None);
+                            is_single_move_legal = true;
                         }
                     },
                     Err(_) => {}
@@ -449,12 +454,10 @@ impl Board {
                 // Two pawn move
                 if piece.is_first_move() && is_single_move_legal {
                     match coordinate.checked_add_individual(single_pawn_move * 2, 0) {
-                        Ok(single_coordinate) => {
-                            match self.get_piece(&single_coordinate) {
-                                Some(_) => { }
-                                None => {
-                                    legal_moves.insert(single_coordinate, None);
-                                }
+                        Ok(single_coordinate) => match self.get_piece(&single_coordinate) {
+                            Some(_) => {}
+                            None => {
+                                legal_moves.insert(single_coordinate, None);
                             }
                         },
                         Err(_) => {}
@@ -464,19 +467,17 @@ impl Board {
                 // Pawn's attack move
                 for column_offset in [-1, 1] {
                     match coordinate.checked_add_individual(single_pawn_move, column_offset) {
-                        Ok(single_coordinate) => {
-                            match self.get_piece(&single_coordinate) {
-                                Some(other_piece) => { 
-                                    if other_piece.team() != piece.team() {
-                                        legal_moves.insert(
-                                            single_coordinate.clone(),
-                                            Some(single_coordinate.clone()),
-                                        );
-                                    }
+                        Ok(single_coordinate) => match self.get_piece(&single_coordinate) {
+                            Some(other_piece) => {
+                                if other_piece.team() != piece.team() {
+                                    legal_moves.insert(
+                                        single_coordinate.clone(),
+                                        Some(single_coordinate.clone()),
+                                    );
                                 }
-                                None => {
-                                    legal_moves.insert(single_coordinate, None);
-                                }
+                            }
+                            None => {
+                                legal_moves.insert(single_coordinate, None);
                             }
                         },
                         Err(_) => {}
@@ -486,27 +487,29 @@ impl Board {
                 // En Passant rule
                 for column_offset in [-1, 1] {
                     match coordinate.checked_add_individual(0, column_offset) {
-                        Ok(single_coordinate) => {
-                            match self.get_piece(&single_coordinate) {
-                                Some(other_piece) => { 
-                                    if other_piece.number_of_moves() == 1 && matches!(other_piece.class(), PieceClass::Pawn) {
-                                        if other_piece.team() != piece.team() {
-                                            legal_moves.insert(
-                                                single_coordinate.checked_add_individual(single_pawn_move, 0).unwrap(),
-                                                Some(single_coordinate.clone()),
-                                            );
-                                        }
+                        Ok(single_coordinate) => match self.get_piece(&single_coordinate) {
+                            Some(other_piece) => {
+                                if other_piece.number_of_moves() == 1
+                                    && matches!(other_piece.class(), PieceClass::Pawn)
+                                {
+                                    if other_piece.team() != piece.team() {
+                                        legal_moves.insert(
+                                            single_coordinate
+                                                .checked_add_individual(single_pawn_move, 0)
+                                                .unwrap(),
+                                            Some(single_coordinate.clone()),
+                                        );
                                     }
                                 }
-                                None => {
-                                    legal_moves.insert(single_coordinate, None);
-                                }
+                            }
+                            None => {
+                                legal_moves.insert(single_coordinate, None);
                             }
                         },
                         Err(_) => {}
                     }
                 }
-            } 
+            }
         }
 
         return Ok(legal_moves);
@@ -514,7 +517,8 @@ impl Board {
 
     /// Checks if a winner is ready to be declared, declares them the winner, and returns the team which won.
     pub fn winner(&self) -> Option<Team> {
-        let kings: Vec<Piece> = self.map
+        let kings: Vec<Piece> = self
+            .map
             .iter()
             .flatten()
             .cloned()
@@ -541,10 +545,8 @@ impl Board {
         for row in self.map() {
             for item in row.iter() {
                 match item {
-                    Some(piece) => {
-                        fen_string.push(piece.clone().into())
-                    },
-                    None => { fen_string.push('1') }
+                    Some(piece) => fen_string.push(piece.clone().into()),
+                    None => fen_string.push('1'),
                 }
             }
             fen_string.push('/');
@@ -553,18 +555,21 @@ impl Board {
 
         // Find all of the repeating ones and replace them with their total
         let re: Regex = Regex::new(r"(1+)").unwrap();
-        let replacement_map: Vec<(String, usize)> = re.find_iter(&fen_string)
+        let replacement_map: Vec<(String, usize)> = re
+            .find_iter(&fen_string)
             .filter_map(|digits| digits.as_str().parse().ok())
             .map(|x: String| (x.clone(), x.len()))
             .unique()
             .sorted_by(|a, b| a.1.cmp(&b.1))
             .rev()
             .collect();
-        
+
         for (key, value) in replacement_map.iter() {
-            fen_string = fen_string.replace(key, value.to_string().as_str()).to_string();
+            fen_string = fen_string
+                .replace(key, value.to_string().as_str())
+                .to_string();
         }
-        
+
         // Adding the final additional information
         fen_string.push(' ');
         match self.turn_to_play {
@@ -590,7 +595,7 @@ impl Default for Board {
             graveyard: Vec::new(),
             team_moves: default_hashmap,
             history: Vec::new(),
-            turn_to_play: Team::White
+            turn_to_play: Team::White,
         }
     }
 }
@@ -599,7 +604,7 @@ impl Default for Board {
 pub enum BoardError {
     EmptyCoordinate,
     IllegalMove,
-    NotYourTurn
+    NotYourTurn,
 }
 
 impl std::fmt::Display for Board {
@@ -638,7 +643,7 @@ pub struct HistoryNode {
 /// A Fen representation of the state of a chess board
 #[derive(Debug)]
 pub struct Fen {
-    pub state: String
+    pub state: String,
 }
 
 impl Fen {
@@ -648,10 +653,19 @@ impl Fen {
 
     // TODO: this should return a result team to handle the case of incorrect character
     pub fn current_team_turn(&self) -> Team {
-        match self.state.split(' ').nth(1).unwrap().to_string().chars().nth(0).unwrap() {
+        match self
+            .state
+            .split(' ')
+            .nth(1)
+            .unwrap()
+            .to_string()
+            .chars()
+            .nth(0)
+            .unwrap()
+        {
             'w' | 'W' => Team::White,
             'b' | 'B' => Team::Black,
-            _ => panic!("Invalid team")
+            _ => panic!("Invalid team"),
         }
     }
 }

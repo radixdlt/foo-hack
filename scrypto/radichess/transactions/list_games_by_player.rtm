@@ -1,0 +1,4 @@
+CALL_METHOD ComponentAddress("021025cfda90adea21506170be47c67ec169e41dbbdd063d54d409") "create_proof_by_amount" Decimal("1") ResourceAddress("0375d27b95a263feb0b18b07e903b15288ab7d0ef928fb11e44bcd");
+POP_FROM_AUTH_ZONE Proof("proof1");
+CALL_METHOD ComponentAddress("021285758b41cf1e8a71fbf0b4ffbb44cd62c8efa938e6db6348c9") "list_games_by_player" Proof("proof1");
+CALL_METHOD_WITH_ALL_RESOURCES ComponentAddress("021025cfda90adea21506170be47c67ec169e41dbbdd063d54d409") "deposit_batch";

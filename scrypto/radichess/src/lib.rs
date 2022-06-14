@@ -3,41 +3,43 @@ use scrypto::prelude::*;
 #[derive(Debug, NonFungibleData)]
 struct RadiChessUser {
     name: String,
-    elo: u64
+    elo: u64,
 }
 
 impl RadiChessUser {
     pub fn new(name: String, elo: u64) -> Self {
-        Self {
-            name,
-            elo
-        }
+        Self { name, elo }
     }
 }
 
 blueprint! {
     struct RadiChess {
         service_auth: Vault,
-        user_vault: Vault
+        user_vault: Vault,
     }
 
     impl RadiChess {
         pub fn create() -> ComponentAddress {
-            let service_auth: Bucket = ResourceBuilder::new_fungible()
-                .initial_supply(1);
+            let service_auth: Bucket = ResourceBuilder::new_fungible().initial_supply(1);
             // Create a new token called "HelloToken," with a fixed supply of 1000, and put that supply into a bucket
-            let radi_chess_user = ResourceBuilder::new_fungible()
+            let radi_chess_user = ResourceBuilder::new_non_fungible()
                 .metadata("name", "RadiChess Player")
                 .metadata("symbol", "RCP")
-                .mintable(rule!(require(service_auth.resource_address())), Mutability::LOCKED)
-                .burnable(rule!(require(service_auth.resource_address())), Mutability::LOCKED)
+                .mintable(
+                    rule!(require(service_auth.resource_address())),
+                    Mutability::LOCKED,
+                )
+                .burnable(
+                    rule!(require(service_auth.resource_address())),
+                    Mutability::LOCKED,
+                )
                 .no_initial_supply();
 
             let access_rules = AccessRules::new().default(AccessRule::AllowAll);
 
             Self {
                 user_vault: Vault::new(radi_chess_user),
-                service_auth: Vault::with_bucket(service_auth)
+                service_auth: Vault::with_bucket(service_auth),
             }
             .instantiate()
             .add_access_check(access_rules)
@@ -46,8 +48,10 @@ blueprint! {
 
         pub fn register_player(&self, name: String, elo: u64) -> Bucket {
             self.service_auth.authorize(|| {
-                let user_id = self.user_vault.non_fungible_ids().len() + 1;
-                borrow_resource_manager!(self.user_vault.resource_address()).mint_non_fungible(&NonFungibleId::from_u64(user_id as u64), RadiChessUser::new(name, elo))
+                borrow_resource_manager!(self.user_vault.resource_address()).mint_non_fungible(
+                    &NonFungibleId::from_bytes(name.as_bytes().to_vec()),
+                    RadiChessUser::new(name, elo),
+                )
             })
         }
 

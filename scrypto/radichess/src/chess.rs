@@ -19,7 +19,7 @@ struct Player {
 #[derive(Debug, Describe, Encode, Decode, TypeId, Serialize)]
 pub enum Status {
     Awaiting,
-    InProgres,
+    InProgress,
     Finished
 }
 
@@ -74,7 +74,7 @@ blueprint! {
             } else if self.board.winner().is_some() {
                 Status::Finished
             } else {
-                Status::InProgres
+                Status::InProgress
             }
         }
 

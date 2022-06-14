@@ -2,7 +2,7 @@ use scrypto::prelude::*;
 use crate::chess::Chess;
 
 #[derive(Debug, NonFungibleData)]
-struct RadiChessUser {
+pub struct RadiChessUser {
     name: String,
     elo: u64,
 }
@@ -63,7 +63,7 @@ blueprint! {
             assert!(badge.resource_address() == self.user_resource, "Invalid Player Badge");
             // Now create the game and return the game component address
             let player_id = badge.non_fungible::<RadiChessUser>().id();
-            let component = Chess::instantiate(player_id);
+            let component = Chess::instantiate(player_id, self.user_resource);
 
             self.games.push(component);
 

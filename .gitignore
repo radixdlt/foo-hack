@@ -1,3 +1,18 @@
 **/target
 .vscode
 Cargo.lock
+# macOS folder attributes
+.DS_Store
+
+# Rust auto-generated
+Cargo.lock
+**/*.rs.bk
+
+# Flamegraph profiles
+flamegraph.svg
+
+# IntelliJ
+.idea/
+
+# Emacs
+*~

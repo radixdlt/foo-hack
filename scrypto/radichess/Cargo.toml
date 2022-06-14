@@ -6,6 +6,8 @@ edition = "2021"
 [dependencies]
 sbor = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v0.4.1" }
 scrypto = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v0.4.1" }
+itertools = "0.10.3"
+regex = "1.5.6"
 
 [dev-dependencies]
 radix-engine = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v0.4.1" }
@@ -16,6 +18,7 @@ lto = true          # Enable Link Time Optimization.
 codegen-units = 1   # Reduce number of codegen units to increase optimizations.
 panic = 'abort'     # Abort on panic.
 strip = "debuginfo" # Strip debug info.
+overflow_checks = false
 
 [lib]
 crate-type = ["cdylib", "lib"]

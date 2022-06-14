@@ -1,0 +1,12 @@
+/Users/clem/Documents/foo-hack/scrypto/target/debug/deps/sbor-ec6c8d91a537f281.rmeta: /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/lib.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/any.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/decode.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/describe.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/encode.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/path.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/rust.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/type_id.rs
+
+/Users/clem/Documents/foo-hack/scrypto/target/debug/deps/sbor-ec6c8d91a537f281.d: /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/lib.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/any.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/decode.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/describe.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/encode.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/path.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/rust.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/type_id.rs
+
+/Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/lib.rs:
+/Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/any.rs:
+/Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/decode.rs:
+/Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/describe.rs:
+/Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/encode.rs:
+/Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/path.rs:
+/Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/rust.rs:
+/Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor/src/type_id.rs:

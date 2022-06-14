@@ -1,0 +1,10 @@
+/Users/clem/Documents/foo-hack/scrypto/target/debug/deps/libsbor_derive-b7328ee735b871c8.dylib: /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/lib.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/decode.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/describe.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/encode.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/type_id.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/utils.rs
+
+/Users/clem/Documents/foo-hack/scrypto/target/debug/deps/sbor_derive-b7328ee735b871c8.d: /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/lib.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/decode.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/describe.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/encode.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/type_id.rs /Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/utils.rs
+
+/Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/lib.rs:
+/Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/decode.rs:
+/Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/describe.rs:
+/Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/encode.rs:
+/Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/type_id.rs:
+/Users/clem/.cargo/git/checkouts/radixdlt-scrypto-1833d92590086ce0/8c176b7/sbor-derive/src/utils.rs:

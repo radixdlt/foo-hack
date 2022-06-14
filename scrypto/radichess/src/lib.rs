@@ -32,8 +32,12 @@ blueprint! {
             // Create a new token called "HelloToken," with a fixed supply of 1000, and put that supply into a bucket
             let radi_chess_user: Bucket = ResourceBuilder::new_fungible()
                 .metadata("name", "RadiChess")
-                .metadata("symbol", "HT")
+                .metadata("symbol", "RC")
+                .mintable(rule!(require(service_auth.resource_address())), Mutability::LOCKED)
+                .burnable(rule!(require(service_auth.resource_address())), Mutability::LOCKED)
                 .initial_supply(1000);
+
+            let access_rules = AccessRules::new().default(AccessRule::AllowAll);
 
             // Instantiate a Hello component, populating its vault with our supply of 1000 HelloToken
             Self {
@@ -41,6 +45,7 @@ blueprint! {
                 service_auth: Vault::with_bucket(service_auth)
             }
             .instantiate()
+            .add_access_check(access_rules)
             .globalize()
         }
 

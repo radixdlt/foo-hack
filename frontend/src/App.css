@@ -1,0 +1,41 @@
+.button {
+    background-color: #EEE;
+    padding: 30px;
+    max-width: 200px;
+    margin: auto;
+    text-align: center;
+    margin-top: 30px;
+    cursor: pointer;
+}
+.header {
+    margin: auto;
+    text-align: center;
+    margin-top: 30px;
+}
+.game-list {
+    margin-top: 20px;
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0 0;
+    display: flex;
+    flex-direction: column;
+}
+.view-btn {
+    padding: 10px;
+    background-color: rgb(246, 245, 245);
+    width: 180px;
+    margin-top: 20px;
+    border-radius: 6px;
+    text-align: left;
+    cursor: pointer;
+}
+.board-outer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.player-title {
+    padding: 20px;
+    font-weight: 700;
+}

@@ -451,8 +451,11 @@ dependencies = [
  "regex",
  "sbor",
  "scrypto",
+<<<<<<< Updated upstream
  "serde",
  "serde-json-wasm",
+=======
+>>>>>>> Stashed changes
 ]
 
 [[package]]

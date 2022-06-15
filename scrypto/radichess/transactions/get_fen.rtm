@@ -1,0 +1,2 @@
+CALL_METHOD ComponentAddress("022e507218b47aaae07f166bf470bf71d9583f4ef31b6ecb114ee2") "get_fen";
+CALL_METHOD_WITH_ALL_RESOURCES ComponentAddress("02e0905317d684478c275540e2ed7170f217e0c557805f7fd2a0d3") "deposit_batch";

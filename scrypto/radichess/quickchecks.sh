@@ -33,6 +33,14 @@ resim set-default-account $rock_account $rock_privkey
 resim call-method $game1 move_piece "E7" "E5" 1,$badgerez
 
 resim set-default-account $redfoo_account $redfoo_privkey
-resim call-method $game1 move_piece "G1" "F3" 1,$badgerez
+resim call-method $game1 move_piece "F1" "C4" 1,$badgerez
 resim set-default-account $rock_account $rock_privkey
 resim call-method $game1 move_piece "B8" "C6" 1,$badgerez
+
+resim set-default-account $redfoo_account $redfoo_privkey
+resim call-method $game1 move_piece "C4" "F7" 1,$badgerez
+resim set-default-account $rock_account $rock_privkey
+resim call-method $game1 move_piece "E8" "F7" 1,$badgerez
+
+resim set-default-account $redfoo_account $redfoo_privkey
+resim call-method $game1 move_piece "D1" "F3" 1,$badgerez

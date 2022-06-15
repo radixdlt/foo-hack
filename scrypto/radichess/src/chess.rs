@@ -72,6 +72,7 @@ blueprint!{
             assert_eq!(self.underway, false);
             assert_eq!(self.completed, false);
             self.player2_id = Some(badge.non_fungible::<RadiChessUser>().id());
+            self.player2_team = Some(Team::White);
             assert_ne!(self.player1_id, self.player2_id.clone().unwrap());
             self.underway = true;
             self.last_move_epoch = Runtime::current_epoch()

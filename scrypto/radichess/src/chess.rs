@@ -77,6 +77,54 @@ blueprint!{
             self.last_move_epoch = Runtime::current_epoch()
         }
 
+        pub fn move_piece(
+            &mut self, 
+            from: String,
+            to: String,
+            player_badge: Proof
+        ) {
+            // Verify that the badge provided is a valid player badge and get their team
+            assert_eq!(player_badge.resource_address(), self.badge_resource, "Invalid player badge");
+            let player_team: Team = {
+                let player_id = player_badge.non_fungible::<RadiChessUser>().id();
+
+                if player_id == self.player1_id {
+                    self.player1_team
+                } else if player_id == self.player2_id.unwrap() {
+                    self.player2_team.unwrap()
+                } else {
+                    panic!("Invalid Player ID")
+                }
+            };
+
+            // Check to ensure that it is the turn of this team to play
+            assert_eq!(self.board.turn_to_play(), player_team, "Not your turn to play");
+
+            // Load up the coordinates from the passed tuples and make sure that they're valid coordinates
+            match (
+                Coordinate::try_from(from),
+                Coordinate::try_from(to),
+            ) {
+                (Ok(from_coordinate), Ok(to_coordinate)) => {
+                    // Make sure that the player is trying to move a piece that belongs to them.
+                    match self.board.team_at_coordinate(&from_coordinate) {
+                        Some(team) => {
+                            if team == player_team {
+                                info!("The team's status before the move is: {:?}", self.board.team_game_status(player_team.other()));
+                                self.board.move_piece(&from_coordinate, &to_coordinate).unwrap();
+                                info!("The team's status before the move is: {:?}", self.board.team_game_status(player_team.other()));
+                                info!("Move has been made, current board is: \n{}", self.board);
+                            } else {
+                                assert!(false, "Can not move another player's piece") 
+                            }
+                        },
+                        None => assert!(false, "Empty coordinate")
+                    }
+                },
+                (_, _) => assert!(false, "Invalid coordinates passed to method") 
+            }
+        }
+
         pub fn get_fen(&self) -> String {
             self.board.fen().state
         }

@@ -46,13 +46,7 @@ const account = {
     },
 
     createBadge: async ({ accountAddress, nickname }) => {
-
-        console.log(accountAddress)
-        console.log(nickname)
-
-        console.log(mappings.component);
-
-        
+   
         const manifest = new ManifestBuilder()
             .callMethod(mappings.component, 'register_player', [`"${nickname}"`, '1300u64'])
             .callMethodWithAllResources(accountAddress, 'deposit_batch')

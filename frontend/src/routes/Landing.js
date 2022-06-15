@@ -4,6 +4,7 @@ import '../App.css';
 import { Box, Tabs, Tab, Typography, Button } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import account from '../pte-specifics/commands/account';
+import game from '../pte-specifics/commands/game';
 import CreateAccountModal from '../components/CreateAccountModal';
 import mappings from '../pte-specifics/address-mappings';
 
@@ -62,7 +63,12 @@ function GameList({ games, type }) {
         </ul>
       )
       :
-      <div>No Games.</div>
+      
+      <>
+        <div>No Games.</div>
+        <Button variant="contained" sx={{ marginTop: '20px' }} onClick={() => game.create()}>Create New Game</Button>
+      </>
+      
   );
 
 }
@@ -169,6 +175,8 @@ function Landing() {
 
     const getUserAccount = await account.fetch();
 
+    // Todo - if account is undefined, ask the use to create an account via the extension
+
     console.log('User Account ↴');
     console.log(getUserAccount);
 
@@ -185,7 +193,6 @@ function Landing() {
       nickname: inputVal
     });
   
-
   }
 
   return (

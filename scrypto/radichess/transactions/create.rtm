@@ -1,0 +1,2 @@
+CALL_FUNCTION PackageAddress("01ce78cf9d1244be4338fc7cbd79c62ca1db9fa895ac90686e87c0") "RadiChess" "create";
+CALL_METHOD_WITH_ALL_RESOURCES ComponentAddress("021025cfda90adea21506170be47c67ec169e41dbbdd063d54d409") "deposit_batch";

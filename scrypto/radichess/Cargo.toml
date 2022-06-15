@@ -1,0 +1,25 @@
+[package]
+name = "radichess"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sbor = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v0.4.1" }
+scrypto = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v0.4.1" }
+itertools = "0.10.3"
+regex = "1.5.6"
+serde-json-wasm = "0.4.1"
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+radix-engine = { git = "https://github.com/radixdlt/radixdlt-scrypto", tag = "v0.4.1" }
+
+[profile.release]
+opt-level = 's'     # Optimize for size.
+lto = true          # Enable Link Time Optimization.
+codegen-units = 1   # Reduce number of codegen units to increase optimizations.
+panic = 'abort'     # Abort on panic.
+strip = "debuginfo" # Strip debug info.
+
+[lib]
+crate-type = ["cdylib", "lib"]

@@ -1,0 +1,2 @@
+CALL_METHOD ComponentAddress("02017f1e047caecd4b81b308865ee74e130cab64d8346a3b671949") "register_player" "redfoo" 1300u64;
+CALL_METHOD_WITH_ALL_RESOURCES ComponentAddress("021025cfda90adea21506170be47c67ec169e41dbbdd063d54d409") "deposit_batch";

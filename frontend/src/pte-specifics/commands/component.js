@@ -14,16 +14,16 @@ const component = {
         const receipt = await signTransaction(manifest);
 
         return {
-            addresses: {
-                component: receipt.newComponents[0],
-                resource: receipt.newResources[0],
-                player_badge_resource: receipt.newResources[1]
+
+            component: receipt.newComponents[0],
+            resources: {
+                chess: receipt.newResources[0],
+                player_badge: receipt.newResources[1]
             }
+
         };
 
     }
-
-
 
 };
 

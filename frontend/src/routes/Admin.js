@@ -1,18 +1,24 @@
 import React from 'react';
 import commands from '../pte-specifics/commands';
-import addressMappings from '../pte-specifics/address-mappings';
+import mappings from '../pte-specifics/address-mappings';
 import '../App.css';
+
+let chessPackage = {};
 
 async function publish() {
 
-  const publishPackage = await commands.sc_package.publish();
-  addressMappings.package = publishPackage.address;
+  chessPackage = await commands.sc_package.publish();
+  
+  console.log('Component Published - Address: ' + chessPackage.address);
 
 }
 
 async function instantiate() {
 
-  commands.component.instantiate(addressMappings.package)
+  const radichessBlueprint = await commands.component.instantiate(chessPackage.address);
+  mappings.blueprint = radichessBlueprint;
+  console.log('Component Instantiated ↴');
+  console.log(radichessBlueprint);
 
 }
 

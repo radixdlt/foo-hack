@@ -39,3 +39,7 @@
     padding: 20px;
     font-weight: 700;
 }
+.constrained-container {
+    max-width: 650px;
+    margin: auto;
+}

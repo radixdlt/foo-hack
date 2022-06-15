@@ -20,15 +20,11 @@ const sc_package = {
         // Send manifest to extension for signing
         const receipt = await signTransaction(manifest);
 
-        console.log(receipt)
-
         return {
             address: receipt.newPackages[0]
         };
 
     }
-
-
 
 };
 

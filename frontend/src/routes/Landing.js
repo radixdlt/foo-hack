@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../App.css';
 
-import { Box, Tabs, Tab, Typography } from '@mui/material';
+import { Box, Tabs, Tab, Typography, Button } from '@mui/material';
 import { useNavigate } from "react-router-dom";
+import account from '../pte-specifics/commands/account';
+import CreateAccountModal from '../components/CreateAccountModal';
+import mappings from '../pte-specifics/address-mappings';
 
 function TabPanel(props) {
 
@@ -34,15 +37,16 @@ function a11yProps(index) {
 
 function GameList({ games, type }) {
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const reducedList = games.filter((game) => {
+  const reducedList = games.filter((game) => {
 
-      return game.status === type;
+    return game.status === type;
 
-    })
+  });
 
-    return (
+  return (
+    reducedList.length > 0 ?
       reducedList.map((game) =>
         <ul key={game.gameAddress} className="game-list">
           <li><strong>Game:</strong> {game.gameAddress}</li>
@@ -57,7 +61,9 @@ function GameList({ games, type }) {
           </li>
         </ul>
       )
-    );
+      :
+      <div>No Games.</div>
+  );
 
 }
 
@@ -102,7 +108,7 @@ function GameTabs() {
   };
 
   return (
-    <Box sx={{ width: '100%', margin: 'auto', marginTop: '40px', maxWidth: '650px' }}>
+    <Box sx={{ width: '100%', margin: 'auto', marginTop: '40px' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="RadiChess Menu">
           <Tab label="My Games" {...a11yProps(0)} />
@@ -137,12 +143,71 @@ function GameTabs() {
 
 function Landing() {
 
+  const [userBadge, setBadge] = useState(null);
+
+  const [modalOpen, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  useEffect(() => {
+
+    getBadge();
+
+  }, []);
+
+  useEffect(() => {
+
+    if (!userBadge) {
+      return;
+    }
+
+    console.log('User has badge: ' + userBadge);
+
+  }, [userBadge]);
+
+  async function getBadge() {
+
+    const getUserAccount = await account.fetch();
+
+    console.log('User Account ↴');
+    console.log(getUserAccount);
+
+    mappings.userAccount = getUserAccount;
+
+    setBadge(getUserAccount.player_badge);
+
+  }
+
+  async function handleNicknameSubmit(inputVal) {
+
+    const userBadgeReceipt = await account.createBadge({
+      accountAddress: mappings.userAccount.address,
+      nickname: inputVal
+    });
+  
+
+  }
+
   return (
     <>
       <h2 className="header">Welcome to RadiChess!</h2>
+      <div className="constrained-container">
 
-      <GameTabs />
+        {!userBadge &&
+          <>
+            <Box textAlign="center" marginTop="30px">
+              <Button variant="contained" onClick={handleOpen}>Create Profile</Button>
+            </Box>
+            <CreateAccountModal open={modalOpen} handleClose={handleClose} handleSubmit={handleNicknameSubmit} />
+          </>
+        }
 
+        {userBadge &&
+          <GameTabs />
+        }
+
+
+      </div>
     </>
   );
 }

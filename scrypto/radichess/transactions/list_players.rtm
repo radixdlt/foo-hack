@@ -1,0 +1,2 @@
+CALL_METHOD ComponentAddress("0271cd6dcaaeb3334f5818fbed41b3ce7f27b6835ce8771615556b") "list_players";
+CALL_METHOD_WITH_ALL_RESOURCES ComponentAddress("021025cfda90adea21506170be47c67ec169e41dbbdd063d54d409") "deposit_batch";

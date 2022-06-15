@@ -817,7 +817,7 @@ impl Fen {
     }
 }
 
-#[derive(Debug, Encode, Decode, TypeId, Describe)]
+#[derive(Debug, Encode, Decode, TypeId, Describe, PartialEq, Eq)]
 pub enum GameStatus {
     // Denotes a check in a game of chess. The team in this enum is the team whose king is in check.
     Check(Team),

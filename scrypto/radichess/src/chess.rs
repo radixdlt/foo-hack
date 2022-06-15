@@ -77,6 +77,10 @@ blueprint!{
             self.last_move_epoch = Runtime::current_epoch()
         }
 
+        pub fn get_fen(&self) -> String {
+            self.board.fen().state
+        }
+
         pub fn get_players(&self) -> (NonFungibleId, Option<NonFungibleId>) {
             (self.player1_id.clone(), self.player2_id.clone())
         }
@@ -93,13 +97,13 @@ blueprint!{
 
         pub fn get_outcome(&self) -> Outcome { 
             if self.board.winner().is_some() {
-                Outcome::Winner(self.get_player())
+                Outcome::Winner(self.get_player_winner())
             } else {
                 Outcome::Undecided
             } 
         }
 
-        fn get_player(&self) -> String {
+        fn get_player_winner(&self) -> String {
             if self.player1_team == self.board.winner().unwrap() {
                 self.player1_id.to_string()
             } else {

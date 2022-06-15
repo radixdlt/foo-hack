@@ -3,38 +3,46 @@ set -x
 resim reset
 
 OP1=$(resim new-account)
-export privkey1=$(echo "$OP1" | sed -nr "s/Private key: ([[:alnum:]_]+)/\1/p")
-export account1=$(echo "$OP1" | sed -nr "s/Account component address: ([[:alnum:]_]+)/\1/p")
+export redfoo_privkey=$(echo "$OP1" | sed -nr "s/Private key: ([[:alnum:]_]+)/\1/p")
+export redfoo_account=$(echo "$OP1" | sed -nr "s/Account component address: ([[:alnum:]_]+)/\1/p")
 
 OP2=$(resim new-account)
-export privkey2=$(echo "$OP2" | sed -nr "s/Private key: ([[:alnum:]_]+)/\1/p")
-export account2=$(echo "$OP2" | sed -nr "s/Account component address: ([[:alnum:]_]+)/\1/p")
+export rock_privkey=$(echo "$OP2" | sed -nr "s/Private key: ([[:alnum:]_]+)/\1/p")
+export rock_account=$(echo "$OP2" | sed -nr "s/Account component address: ([[:alnum:]_]+)/\1/p")
 
 export package=$(resim publish . | sed -nr "s/Success! New Package: ([[:alnum:]_]+)/\1/p")
 
-CP_OP=$(resim call-function $package Chess instantiate_default)
-export component=$(echo "$CP_OP" | sed -nr "s/└─ Component: ([[:alnum:]_]+)/\1/p")
-export player=$(echo "$CP_OP" | sed -nr "s/.*Resource: ([[:alnum:]_]+)/\1/p" | sed '1!d')
+CP_OP=$(resim call-function $package RadiChess create)
+export chessmgr=$(echo "$CP_OP" | sed -nr "s/└─ Component: ([[:alnum:]_]+)/\1/p")
+export badgerez=$(echo "$CP_OP" | sed -nr "s/.*Resource: ([[:alnum:]_]+)/\1/p" | sed '2!d')
 
-resim transfer 1 $player $account2
+resim set-default-account $redfoo_account $redfoo_privkey
+resim call-method $chessmgr register_player "RedFoo" 1700
+resim set-default-account $rock_account $rock_privkey
+resim call-method $chessmgr register_player "Rock" 1500
 
-# At this point account1 is the White Team, and Account 2 is the Black Team
-resim set-default-account $account1 $privkey1
-resim call-method $component move_piece "A2" "A4" 1,$player
-resim set-default-account $account2 $privkey2
-resim call-method $component move_piece "A7" "A5" 1,$player
+# Now Rock starts the game and will play Black
+GM_OP=$(resim call-method $chessmgr start_game 1,$badgerez)
+export game1=$(echo "$GM_OP" | sed -nr "s/└─ Component: ([[:alnum:]_]+)/\1/p")
 
-resim set-default-account $account1 $privkey1
-resim call-method $component move_piece "B2" "B4" 1,$player
-resim set-default-account $account2 $privkey2
-resim call-method $component move_piece "B7" "B5" 1,$player
+# RedFoo joins the game and makes the first move as White
+resim set-default-account $redfoo_account $redfoo_privkey
+resim call-method $game1 join 1,$badgerez
+resim call-method $game1 move_piece "E2" "E4" 1,$badgerez
+resim set-default-account $rock_account $rock_privkey
+resim call-method $game1 move_piece "E7" "E5" 1,$badgerez
 
-resim set-default-account $account1 $privkey1
-resim call-method $component move_piece "C1" "A3" 1,$player
-resim set-default-account $account2 $privkey2
-resim call-method $component move_piece "C7" "C5" 1,$player
+# resim set-default-account $account1 $privkey1
+# resim call-method $component move_piece "B2" "B4" 1,$player
+# resim set-default-account $account2 $privkey2
+# resim call-method $component move_piece "B7" "B5" 1,$player
 
-resim set-default-account $account1 $privkey1
-resim call-method $component move_piece "B4" "C5" 1,$player
-resim set-default-account $account2 $privkey2
-resim call-method $component move_piece "D7" "D5" 1,$player
+# resim set-default-account $account1 $privkey1
+# resim call-method $component move_piece "C1" "A3" 1,$player
+# resim set-default-account $account2 $privkey2
+# resim call-method $component move_piece "C7" "C5" 1,$player
+
+# resim set-default-account $account1 $privkey1
+# resim call-method $component move_piece "B4" "C5" 1,$player
+# resim set-default-account $account2 $privkey2
+# resim call-method $component move_piece "D7" "D5" 1,$player

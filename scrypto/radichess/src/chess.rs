@@ -90,7 +90,7 @@ blueprint!{
 
                 if player_id == self.player1_id {
                     self.player1_team
-                } else if player_id == self.player2_id.unwrap() {
+                } else if player_id == self.player2_id.clone().unwrap() {
                     self.player2_team.unwrap()
                 } else {
                     panic!("Invalid Player ID")

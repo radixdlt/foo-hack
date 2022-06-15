@@ -131,6 +131,8 @@ blueprint! {
                 })
                 .collect::<Vec<GameJSON>>();
 
+            info!("{}", serde_json_wasm::to_string(&found_games).unwrap());
+
             serde_json_wasm::to_string(&found_games).unwrap()
         }
 

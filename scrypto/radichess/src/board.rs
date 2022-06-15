@@ -205,11 +205,12 @@ impl Board {
 
         // Checking the status of the game based on the current coordinates of the king and where it can go.
         if endangered_coordinates.contains(&king_coordinate) {
-            if self.piece_legal_moves(&king_coordinate, true)
-                .unwrap()
+            let king_possible_moves: HashMap<Coordinate, Option<Coordinate>> = self.piece_legal_moves(&king_coordinate, true).unwrap();
+            if king_possible_moves
                 .values()
                 .filter_map(|x| x.clone())
-                .all(|x| endangered_coordinates.contains(&x)) 
+                .map(|x| endangered_coordinates.contains(&x))
+                .any(|x| !x) || (king_possible_moves.len() == 0)
             {
                 GameStatus::CheckMate(team)
             } else {

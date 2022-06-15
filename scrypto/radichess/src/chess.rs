@@ -113,7 +113,7 @@ blueprint!{
                             if team == player_team {
                                 info!("The team's status before the move is: {:?}", self.board.team_game_status(player_team.other()));
                                 self.board.move_piece(&from_coordinate, &to_coordinate).unwrap();
-                                info!("The team's status before the move is: {:?}", self.board.team_game_status(player_team.other()));
+                                info!("The team's status after the move is: {:?}", self.board.team_game_status(player_team.other()));
                                 info!("Move has been made, current board is: \n{}", self.board);
                             } else {
                                 assert!(false, "Can not move another player's piece") 

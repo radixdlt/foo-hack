@@ -8,6 +8,8 @@ import game from '../pte-specifics/commands/game';
 import account from '../pte-specifics/commands/account';
 import mappings from '../pte-specifics/address-mappings';
 
+let intervalRef = null;
+
 function ButtonAppBar() {
 
   const navigate = useNavigate();
@@ -51,6 +53,7 @@ function Game() {
   const [gameInfo, setGameInfo] = useState(null);
   const [userBadge, setBadge] = useState(null);
   const [gameInstance, setGameInstance] = useState(new Chess());
+  const [gameResults, setGameResults] = useState(null);
 
   useEffect(() => {
 
@@ -67,20 +70,26 @@ function Game() {
     if (!userBadge) {
       return;
     }
-    
+
     const infoPoll = setInterval(() => {
       getGameInfo(params.gameAddress);
     }, 5000);
 
+    intervalRef = infoPoll;
+
     return () => {
-      clearInterval(infoPoll);
+      clearInterval(intervalRef);
     };
 
   }, [userBadge]);
 
   useEffect(() => {
 
-    console.log(gameInfo);
+    if (intervalRef && gameInfo && gameInfo.status === 'Finished') {
+      clearInterval(intervalRef);
+    }
+
+    outcomeHandler();
 
   }, [gameInfo]);
 
@@ -90,6 +99,36 @@ function Game() {
       modify(update);
       return update;
     });
+  }
+
+  function outcomeHandler() {
+
+    if (!gameInfo || !userBadge) {
+      return;
+    }
+
+    const results = {
+      outcome: {
+        winner: null,
+        loser: null
+      },
+      current_player_status: null
+    };
+
+    console.log(gameInfo)
+
+    if (gameInfo.player1.player_id === gameInfo.outcome.Winner ? gameInfo.player1 : gameInfo.player2) {
+      results.outcome.winner = gameInfo.player1;
+      results.outcome.loser = gameInfo.player2;
+    } else {
+      results.outcome.winner = gameInfo.player2;
+      results.outcome.loser = gameInfo.player2;
+    }
+
+    results.current_player_status = userBadge.nonFungibleIds[0] === results.outcome.winner.player_id ? 'win' : 'loss';
+
+    setGameResults(results);
+
   }
 
   async function getGameInfo(gameAddress) {
@@ -162,6 +201,19 @@ function Game() {
           :
           <>
             <div className="player-title">{setup.boardTopTitle}</div>
+
+            {gameResults &&
+
+              <div className="result-image">
+                {gameResults.current_player_status === 'win' ?
+                  <div>You Win!</div>
+                  :
+                  <div>You Lose!</div>
+                }
+              </div>
+
+            }
+            
             <Chessboard position={gameInfo.fen ?? ''} onPieceDrop={onDrop} boardOrientation={setup.orientation} />
             <div className="player-title">{setup.boardBottomTitle}</div>
           </>

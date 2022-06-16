@@ -42,4 +42,16 @@
 .constrained-container {
     max-width: 650px;
     margin: auto;
+    position: relative;
+}
+.result-image {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    width: 560px;
+    height: 560px;
+    background-color: #EEE;
+    opacity: .9;
+    justify-content: center;
+    z-index: 10;
 }

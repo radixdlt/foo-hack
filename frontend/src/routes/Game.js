@@ -67,14 +67,20 @@ function Game() {
     if (!userBadge) {
       return;
     }
+    
+    const infoPoll = setInterval(() => {
+      getGameInfo(params.gameAddress);
+    }, 5000);
 
-    getGameInfo(params.gameAddress);
+    return () => {
+      clearInterval(infoPoll);
+    };
 
   }, [userBadge]);
 
   useEffect(() => {
 
-    //console.log(gameInfo);
+    console.log(gameInfo);
 
   }, [gameInfo]);
 

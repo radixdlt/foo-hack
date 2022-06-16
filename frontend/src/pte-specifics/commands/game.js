@@ -57,9 +57,7 @@ const game = {
             }
         });
 
-        console.log(results)
-
-        return JSON.parse(results.outputs[0]).value;
+        return JSON.parse(JSON.parse(results.outputs[0]).value);
 
     },
 
@@ -81,7 +79,7 @@ const game = {
         const manifest = new ManifestBuilder()
             .createProofFromAccountByAmount(mappings.userAccount.address, '1', mappings.player_badge)
             .popFromAuthZone('proof1')
-            .callMethod(gameAddress, 'move_piece', [from, to, 'Proof("proof1")'])
+            .callMethod(gameAddress, 'move_piece', [`"${from}"`, `"${to}"`, 'Proof("proof1")'])
             .build()
             .toString();
 

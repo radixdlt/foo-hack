@@ -52,11 +52,7 @@ const account = {
             .build()
             .toString();
 
-        console.log(manifest)
-
         const receipt = await signTransaction(manifest);
-
-        console.log(JSON.stringify(receipt, null, 2));
 
     }
 

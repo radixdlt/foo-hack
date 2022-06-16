@@ -17,7 +17,6 @@ function getBadgeFromBalances({ accountResources }) {
 const account = {
 
     fetch: async () => {
-
         const accountAddress = await getAccountAddress();
 
         if (!accountAddress) {

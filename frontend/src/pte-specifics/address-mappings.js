@@ -1,10 +1,10 @@
  const mappings = {
   
     userAccount: {},
-    package: '011db796f858b4d7801bff66f325437d9a0b9a25ecceb9e5703a2c',
-    component: '0237b16e440334757f277179302bba8ddf948770ebd87f9fae06a4',
-    player_badge: '0322753d32a7d817299717d41e77124672d0e9ed2f7b1c49de4d52',
-    blueprint: ''
+    package: "01a82f1651a9c4566840996f07419487491c7ea3d9667dfd5049bc",
+    component: "028f69fce91a3fd6bd8d7802bce6d2ff222a5de5bb3192d40099f3",
+    player_badge: "03034c67932f334bbdd40bc729a354044d47029fd89180f9e03458",
+    blueprint: ""
     
 };
 

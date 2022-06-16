@@ -40,7 +40,23 @@ function GameList({ games, type }) {
 
   const navigate = useNavigate();
 
-  const reducedList = games.filter((game) => {
+  async function joinGame(gameAddress) {
+
+    const joinResult = await game.joinGame(gameAddress);
+
+    if(!joinResult) {
+      return null;
+    }
+
+    navigate(`/game/${gameAddress}`);
+
+  }
+
+  if (!games.games) {
+    return null;
+  }
+
+  const reducedList = games.games.filter((game) => {
 
     return game.status === type;
 
@@ -49,63 +65,39 @@ function GameList({ games, type }) {
   return (
     reducedList.length > 0 ?
       reducedList.map((game) =>
-        <ul key={game.gameAddress} className="game-list">
-          <li><strong>Game:</strong> {game.gameAddress}</li>
+        <ul key={game.game_address} className="game-list">
+          <li><strong>Game:</strong> {game.game_address}</li>
           <li>
-            <strong>Player 1:</strong> {game.player_1.nickname} <em>(elo: {game.player_1.elo})</em>
+            <strong>Player 1:</strong> {game.player1?.nickname} <em>(elo: {game.player1?.elo})</em>
           </li>
           <li>
-            <strong>Player 2:</strong> {game.player_2.nickname} <em>(elo: {game.player_2.elo})</em>
+            <strong>Player 2:</strong> {game.player2?.nickname} <em>(elo: {game.player2?.elo})</em>
           </li>
-          <li>
-            <div className="view-btn" onClick={() => navigate(`/game/${game.gameAddress}`)}>View Game</div>
-          </li>
+
+          {type === 'InProgress' &&
+            <li>
+              <div className="view-btn" onClick={() => navigate(`/game/${game.game_address}`)}>Spectate Game</div>
+            </li>
+          }
+
+          {type === 'Awaiting' &&
+            <li>
+              <div className="view-btn" onClick={() => joinGame(game.game_address)}>Join Game</div>
+            </li>
+          }
+
         </ul>
       )
       :
-      
       <>
         <div>No Games.</div>
-        <Button variant="contained" sx={{ marginTop: '20px' }} onClick={() => game.create()}>Create New Game</Button>
       </>
-      
+
   );
 
 }
 
-const mockData = {
-
-  games: [
-    {
-      status: 'finshed',
-      gameAddress: '21vcXrzHEnhlSKhfmwQADZc6iK',
-      player_1: {
-        nickname: 'Red A',
-        elo: 2000
-      },
-      player_2: {
-        nickname: 'Beem A',
-        elo: 1500
-      },
-      outcome: 'draw'
-    },
-    {
-      status: 'in_progress',
-      gameAddress: '21vcXrzHEnhlSKhfmwQADZc6iK',
-      player_1: {
-        nickname: 'Red B',
-        elo: 1000
-      },
-      player_2: {
-        nickname: 'Beem B',
-        elo: 1200
-      }
-    }
-  ]
-
-};
-
-function GameTabs() {
+function GameTabs(games) {
 
   const [value, setValue] = useState(0);
 
@@ -124,23 +116,24 @@ function GameTabs() {
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
-
-        <GameList games={mockData.games} type="my_games" />
-
+        <>
+          <GameList games={games} type="MyGames" />
+          <Button variant="contained" sx={{ marginTop: '20px' }} onClick={() => game.create()}>Create New Game</Button>
+        </>
       </TabPanel>
       <TabPanel value={value} index={1}>
 
-        <GameList games={mockData.games} type="awaiting" />
+        <GameList games={games} type="Awaiting" />
 
       </TabPanel>
       <TabPanel value={value} index={2}>
 
-        <GameList games={mockData.games} type="in_progress" />
+        <GameList games={games} type="InProgress" />
 
       </TabPanel>
       <TabPanel value={value} index={3}>
 
-        <GameList games={mockData.games} type="finshed" />
+        <GameList games={games} type="Finshed" />
 
       </TabPanel>
     </Box>
@@ -150,6 +143,7 @@ function GameTabs() {
 function Landing() {
 
   const [userBadge, setBadge] = useState(null);
+  const [games, setGames] = useState(null);
 
   const [modalOpen, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -157,7 +151,13 @@ function Landing() {
 
   useEffect(() => {
 
-    getBadge();
+    setTimeout(() => {
+
+      getBadge();
+      getGames();
+
+    }, 500);
+
 
   }, []);
 
@@ -166,8 +166,6 @@ function Landing() {
     if (!userBadge) {
       return;
     }
-
-    console.log('User has badge: ' + userBadge);
 
   }, [userBadge]);
 
@@ -186,13 +184,20 @@ function Landing() {
 
   }
 
+  async function getGames() {
+
+    const games = await game.viewGames();
+    setGames(games);
+
+  }
+
   async function handleNicknameSubmit(inputVal) {
 
     const userBadgeReceipt = await account.createBadge({
       accountAddress: mappings.userAccount.address,
       nickname: inputVal
     });
-  
+
   }
 
   return (
@@ -210,9 +215,8 @@ function Landing() {
         }
 
         {userBadge &&
-          <GameTabs />
+          <GameTabs games={games} />
         }
-
 
       </div>
     </>

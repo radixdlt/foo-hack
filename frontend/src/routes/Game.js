@@ -207,6 +207,12 @@ function Game() {
 
   }
 
+  function gifClass() {
+
+    return gameResults.current_player_status === 'spectator' ? 'win' : gameResults.current_player_status;
+
+  }
+
   function resultText() {
 
     if (!gameResults) {
@@ -241,7 +247,7 @@ function Game() {
 
             {gameResults &&
 
-              <div className="result-image">
+              <div className={'result-image ' + gifClass()}>
                 <div>{resultText()}</div>
               </div>
 

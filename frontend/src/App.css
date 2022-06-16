@@ -47,11 +47,23 @@
 .result-image {
     position: absolute;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    box-sizing: border-box;
+    padding-top: 10px;
     width: 560px;
     height: 560px;
     background-color: #EEE;
     opacity: .9;
     justify-content: center;
     z-index: 10;
+    background-position: center center;
+    background-repeat: no-repeat;
+    font-size: 30px;
+    font-weight: 700;
+}
+.result-image.win {
+    background-image: url('../../frontend/public/result-gifs/win.gif');
+}
+.result-image.loss {
+    background-image: url('../../frontend/public/result-gifs/lose.gif');
 }

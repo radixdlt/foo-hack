@@ -145,6 +145,15 @@ blueprint! {
                 None
             };
 
+            let player_turn = if self.player1_team == self.board.turn_to_play() {
+                Some(self.player1_id.clone().to_string())
+            } else {
+                match self.player2_id.clone() {
+                    Some(p) => Some(p.to_string()),
+                    None => None
+                }
+            };
+
             let game = GameJSON::new(
                 Runtime::actor().component_address().unwrap().to_string(),
                 self.get_outcome(),
@@ -156,6 +165,7 @@ blueprint! {
                 ),
                 player2_details,
                 Some(self.get_fen()),
+                player_turn
             );
 
             serde_json_wasm::to_string(&game).unwrap()

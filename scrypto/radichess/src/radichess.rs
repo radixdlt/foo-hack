@@ -40,6 +40,7 @@ pub struct GameJSON {
     player1: Player,
     player2: Option<Player>,
     fen: Option<String>,
+    player_turn: Option<String>,
 }
 
 impl GameJSON {
@@ -50,6 +51,7 @@ impl GameJSON {
         player1: Player,
         player2: Option<Player>,
         fen: Option<String>,
+        player_turn: Option<String>
     ) -> Self {
         Self {
             game_address,
@@ -58,6 +60,7 @@ impl GameJSON {
             player1,
             player2,
             fen,
+            player_turn
         }
     }
 }
@@ -195,6 +198,7 @@ blueprint! {
                         ),
                         player2_details,
                         None,
+                        None
                     )
                 })
                 .collect::<Vec<GameJSON>>();

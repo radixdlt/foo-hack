@@ -1,10 +1,10 @@
 use crate::coordinate::{Coordinate, CoordinatePath};
 use crate::piece::{Piece, PieceClass, Team};
-use std::collections::HashMap;
 use itertools::Itertools;
 use regex::Regex;
 use sbor::Decode;
 use scrypto::prelude::*;
+use std::collections::HashMap;
 
 /// Represents the current chess board with all of its pieces
 #[derive(Debug, Encode, Decode, TypeId, Describe, Clone)]
@@ -25,14 +25,14 @@ pub struct Board {
     turn_to_play: Team,
 
     /// The team which has won
-    winner: Option<Team>
+    winner: Option<Team>,
 }
 
 impl Board {
     /// ================================================================================================================
     /// Functions used in instantiating a new board
     /// ================================================================================================================
-    
+
     /// Creates a new default board
     pub fn new() -> Self {
         let mut board: Self = Self::default();
@@ -80,12 +80,18 @@ impl Board {
             for char in row_data.chars() {
                 if char.is_alphabetic() {
                     let piece: Piece = Piece::try_from(char).unwrap();
-                    board.set_piece(&Coordinate::try_from((row_index, column_index)).unwrap(), Some(piece));
+                    board.set_piece(
+                        &Coordinate::try_from((row_index, column_index)).unwrap(),
+                        Some(piece),
+                    );
                     column_index += 1;
                 } else if char.is_numeric() {
                     let amount: u32 = char.to_digit(10).unwrap();
                     for _ in 0..amount {
-                        board.set_piece(&Coordinate::try_from((row_index, column_index)).unwrap(), None);
+                        board.set_piece(
+                            &Coordinate::try_from((row_index, column_index)).unwrap(),
+                            None,
+                        );
                         column_index += 1;
                     }
                 } else {
@@ -98,7 +104,7 @@ impl Board {
             board.toggle_turn_to_play();
         }
 
-        return board
+        return board;
     }
 
     pub fn new_with_map(map: &[[Option<Piece>; 8]; 8]) -> Self {
@@ -117,7 +123,7 @@ impl Board {
         }
 
         Ok(board)
-    } 
+    }
 
     /// ================================================================================================================
     /// Getter methods for the board state and other retrieval operations
@@ -146,7 +152,7 @@ impl Board {
     pub fn team_at_coordinate(&self, coordinate: &Coordinate) -> Option<Team> {
         match self.piece(coordinate) {
             Some(piece) => Some(piece.team()),
-            None => None
+            None => None,
         }
     }
 
@@ -160,13 +166,13 @@ impl Board {
         for (i, row) in self.map().iter().enumerate() {
             for (j, piece) in row.iter().enumerate() {
                 let coordinate: Coordinate = Coordinate::try_from((i, j)).unwrap();
-                
+
                 match piece {
                     Some(piece) => {
                         if piece.class() == *piece_class {
                             vec.push(coordinate);
                         }
-                    },
+                    }
                     None => {}
                 }
             }
@@ -175,7 +181,11 @@ impl Board {
         vec
     }
 
-    pub fn coordinates_of_piece_class_for_team(&self, piece_class: &PieceClass, team: &Team) -> Vec<Coordinate> {
+    pub fn coordinates_of_piece_class_for_team(
+        &self,
+        piece_class: &PieceClass,
+        team: &Team,
+    ) -> Vec<Coordinate> {
         self.coordinates_of_piece_class(piece_class)
             .into_iter()
             .filter(|x| self.piece(x).unwrap().team() == *team)
@@ -185,32 +195,42 @@ impl Board {
     // TODO: Fix some edge cases.
     pub fn team_game_status(&self, team: Team) -> GameStatus {
         // Getting the coordinate of the king for this team
-        let king_coordinate: Coordinate = *self.coordinates_of_piece_class_for_team(&PieceClass::King, &team)
+        let king_coordinate: Coordinate = *self
+            .coordinates_of_piece_class_for_team(&PieceClass::King, &team)
             .get(0)
             .unwrap();
-        
+
         // Getting all of the potential places that the enemy pieces can go and therefore endanger
-        let endangered_coordinates: Vec<Coordinate> = [PieceClass::Bishop, PieceClass::Knight, PieceClass::King, PieceClass::Queen, PieceClass::Pawn, PieceClass::Rook]
-            .iter()
-            .map(|x| self.coordinates_of_piece_class_for_team(x, &team.other()))
-            .flatten()
-            .flat_map(|x| 
-                self.piece_legal_moves(&x, true)
-                    .unwrap()
-                    .values()
-                    .filter_map(|x| x.clone())
-                    .collect::<Vec<Coordinate>>()
-            )
-            .collect();
+        let endangered_coordinates: Vec<Coordinate> = [
+            PieceClass::Bishop,
+            PieceClass::Knight,
+            PieceClass::King,
+            PieceClass::Queen,
+            PieceClass::Pawn,
+            PieceClass::Rook,
+        ]
+        .iter()
+        .map(|x| self.coordinates_of_piece_class_for_team(x, &team.other()))
+        .flatten()
+        .flat_map(|x| {
+            self.piece_legal_moves(&x, true)
+                .unwrap()
+                .values()
+                .filter_map(|x| x.clone())
+                .collect::<Vec<Coordinate>>()
+        })
+        .collect();
 
         // Checking the status of the game based on the current coordinates of the king and where it can go.
         if endangered_coordinates.contains(&king_coordinate) {
-            let king_possible_moves: HashMap<Coordinate, Option<Coordinate>> = self.piece_legal_moves(&king_coordinate, true).unwrap();
+            let king_possible_moves: HashMap<Coordinate, Option<Coordinate>> =
+                self.piece_legal_moves(&king_coordinate, true).unwrap();
             if king_possible_moves
                 .values()
                 .filter_map(|x| x.clone())
-                .map(|x| endangered_coordinates.contains(&x))
-                .any(|x| !x) || (king_possible_moves.len() == 0)
+                .map(|x| !endangered_coordinates.contains(&x))
+                .any(|x| !x)
+                || (king_possible_moves.len() == 0)
             {
                 GameStatus::CheckMate(team)
             } else {
@@ -253,14 +273,10 @@ impl Board {
     /// ================================================================================================================
     /// Operation methods essential for the correct operation and main logic of the board
     /// ================================================================================================================
-    
-    /// Moves a piece from one coordinate to another coordinate. Checks that the move is legal before performing the 
+
+    /// Moves a piece from one coordinate to another coordinate. Checks that the move is legal before performing the
     /// move.
-    pub fn move_piece(
-        &mut self,
-        from: &Coordinate,
-        to: &Coordinate
-    ) -> Result<(), BoardError> {
+    pub fn move_piece(&mut self, from: &Coordinate, to: &Coordinate) -> Result<(), BoardError> {
         // Getting the piece at the specified coordinate.
         let mut piece: Piece = {
             match self.piece(from) {
@@ -271,11 +287,12 @@ impl Board {
 
         // Check if this piece is of the team that is currently allowed to play, if not then return an error
         if piece.team() != self.turn_to_play {
-            return Err(BoardError::NotYourTurn)
+            return Err(BoardError::NotYourTurn);
         }
 
         // Getting all of the legal moves for this piece
-        let legal_moves: HashMap<Coordinate, Option<Coordinate>> = self.piece_legal_moves(from, true).unwrap();
+        let legal_moves: HashMap<Coordinate, Option<Coordinate>> =
+            self.piece_legal_moves(from, true).unwrap();
 
         // If true, then this is a legal move and we can go ahead with the removal of the old item.
         if legal_moves.contains_key(to) {
@@ -283,7 +300,7 @@ impl Board {
             match legal_moves.get(from) {
                 Some(to_destroy_coordinate) => {
                     self.remove_piece(&to_destroy_coordinate.unwrap())?;
-                },
+                }
                 None => {}
             }
 
@@ -296,7 +313,11 @@ impl Board {
             *self.team_moves.get_mut(&piece.team()).unwrap() += 1;
 
             // Adding the move to the history of the match
-            self.history.push(HistoryNode { piece: piece, from: from.clone(), to: to.clone() });
+            self.history.push(HistoryNode {
+                piece: piece,
+                from: from.clone(),
+                to: to.clone(),
+            });
 
             // Toggle the teams
             self.toggle_turn_to_play();
@@ -307,11 +328,9 @@ impl Board {
                 self.set_piece(to, Some(Piece::new(PieceClass::Queen, piece.team())));
             }
 
-            // Check if the other team is in a checkmate 
+            // Check if the other team is in a checkmate
             match self.team_game_status(piece.team().other()) {
-                GameStatus::CheckMate(team) => {
-                    self.winner = Some(team.other())
-                },
+                GameStatus::CheckMate(team) => self.winner = Some(team.other()),
                 _ => {}
             }
 
@@ -542,13 +561,11 @@ impl Board {
                 // Single pawn move
                 let mut is_single_move_legal: bool = false;
                 match coordinate.checked_add_individual(single_pawn_move, 0) {
-                    Ok(single_coordinate) => {
-                        match self.piece(&single_coordinate) {
-                            Some(_) => { }
-                            None => {
-                                legal_moves.insert(single_coordinate, None);
-                                is_single_move_legal = true;
-                            }
+                    Ok(single_coordinate) => match self.piece(&single_coordinate) {
+                        Some(_) => {}
+                        None => {
+                            legal_moves.insert(single_coordinate, None);
+                            is_single_move_legal = true;
                         }
                     },
                     Err(_) => {}
@@ -557,12 +574,10 @@ impl Board {
                 // Two pawn move
                 if piece.is_first_move() && is_single_move_legal {
                     match coordinate.checked_add_individual(single_pawn_move * 2, 0) {
-                        Ok(single_coordinate) => {
-                            match self.piece(&single_coordinate) {
-                                Some(_) => { }
-                                None => {
-                                    legal_moves.insert(single_coordinate, None);
-                                }
+                        Ok(single_coordinate) => match self.piece(&single_coordinate) {
+                            Some(_) => {}
+                            None => {
+                                legal_moves.insert(single_coordinate, None);
                             }
                         },
                         Err(_) => {}
@@ -572,18 +587,16 @@ impl Board {
                 // Pawn's attack move
                 for column_offset in [-1, 1] {
                     match coordinate.checked_add_individual(single_pawn_move, column_offset) {
-                        Ok(single_coordinate) => {
-                            match self.piece(&single_coordinate) {
-                                Some(other_piece) => { 
-                                    if other_piece.team() != piece.team() {
-                                        legal_moves.insert(
-                                            single_coordinate.clone(),
-                                            Some(single_coordinate.clone()),
-                                        );
-                                    }
+                        Ok(single_coordinate) => match self.piece(&single_coordinate) {
+                            Some(other_piece) => {
+                                if other_piece.team() != piece.team() {
+                                    legal_moves.insert(
+                                        single_coordinate.clone(),
+                                        Some(single_coordinate.clone()),
+                                    );
                                 }
-                                None => {}
                             }
+                            None => {}
                         },
                         Err(_) => {}
                     }
@@ -592,27 +605,29 @@ impl Board {
                 // En Passant rule
                 for column_offset in [-1, 1] {
                     match coordinate.checked_add_individual(0, column_offset) {
-                        Ok(single_coordinate) => {
-                            match self.piece(&single_coordinate) {
-                                Some(other_piece) => { 
-                                    if other_piece.number_of_moves() == 1 && matches!(other_piece.class(), PieceClass::Pawn) {
-                                        if other_piece.team() != piece.team() {
-                                            legal_moves.insert(
-                                                single_coordinate.checked_add_individual(single_pawn_move, 0).unwrap(),
-                                                Some(single_coordinate.clone()),
-                                            );
-                                        }
+                        Ok(single_coordinate) => match self.piece(&single_coordinate) {
+                            Some(other_piece) => {
+                                if other_piece.number_of_moves() == 1
+                                    && matches!(other_piece.class(), PieceClass::Pawn)
+                                {
+                                    if other_piece.team() != piece.team() {
+                                        legal_moves.insert(
+                                            single_coordinate
+                                                .checked_add_individual(single_pawn_move, 0)
+                                                .unwrap(),
+                                            Some(single_coordinate.clone()),
+                                        );
                                     }
                                 }
-                                None => {
-                                    legal_moves.insert(single_coordinate, None);
-                                }
+                            }
+                            None => {
+                                legal_moves.insert(single_coordinate, None);
                             }
                         },
                         Err(_) => {}
                     }
                 }
-            } 
+            }
         }
 
         if remove_check_possibilities {
@@ -620,41 +635,41 @@ impl Board {
                 .iter()
                 .filter_map(|(to_coordinate, maybe_destruction_coordinate)| {
                     let mut simulated_map: [[Option<Piece>; 8]; 8] = self.map().clone();
-    
+
                     match maybe_destruction_coordinate {
                         Some(destruction_coordinate) => {
-                            simulated_map[destruction_coordinate.row()][destruction_coordinate.column()] = None;
-                        },
+                            simulated_map[destruction_coordinate.row()]
+                                [destruction_coordinate.column()] = None;
+                        }
                         None => {}
                     }
-    
-                    simulated_map[to_coordinate.row()][to_coordinate.column()] = simulated_map[coordinate.row()][coordinate.column()];
+
+                    simulated_map[to_coordinate.row()][to_coordinate.column()] =
+                        simulated_map[coordinate.row()][coordinate.column()];
                     simulated_map[coordinate.row()][coordinate.column()] = None;
-                    
+
                     let simulated_board: Board = Self::new_with_map(&simulated_map);
-    
+
                     let endangered_coordinates: Vec<Coordinate> = {
                         let mut vec: Vec<Coordinate> = Vec::new();
-    
+
                         for (i, row) in simulated_board.map().iter().enumerate() {
                             for (j, other_piece) in row.iter().enumerate() {
                                 match other_piece {
                                     Some(other_piece) => {
                                         if other_piece.team() == piece.team().other() {
-                                            vec.push(
-                                                Coordinate::try_from((i, j)).unwrap()
-                                            )
+                                            vec.push(Coordinate::try_from((i, j)).unwrap())
                                         }
-                                    },
+                                    }
                                     None => {}
                                 }
                             }
                         }
-    
+
                         vec
                     }
                     .iter()
-                    .map(|x| 
+                    .map(|x| {
                         simulated_board
                             .piece_legal_moves(x, false)
                             .unwrap()
@@ -662,25 +677,24 @@ impl Board {
                             .filter(|x| x.is_some())
                             .map(|x| x.unwrap())
                             .collect::<Vec<Coordinate>>()
-                    )
+                    })
                     .flatten()
                     .collect();
-    
+
                     // Ensure that our team's king is not one of the endangered coordinates
                     let king_coordinate: Coordinate = simulated_board
                         .coordinates_of_piece_class_for_team(&PieceClass::King, &piece.team())
                         .get(0)
                         .unwrap()
                         .clone();
-                    
+
                     if endangered_coordinates.contains(&king_coordinate) {
                         None
                     } else {
                         Some((to_coordinate.clone(), maybe_destruction_coordinate.clone()))
                     }
                 })
-                .collect::<HashMap<Coordinate, Option<Coordinate>>>()
-            )
+                .collect::<HashMap<Coordinate, Option<Coordinate>>>())
         } else {
             Ok(legal_moves)
         }
@@ -689,7 +703,7 @@ impl Board {
     /// ================================================================================================================
     /// Utility methods and methods useful to have.
     /// ================================================================================================================
-    
+
     pub fn fen(&self) -> Fen {
         let mut fen_string: String = String::new();
 
@@ -697,10 +711,8 @@ impl Board {
         for row in self.map() {
             for item in row.iter() {
                 match item {
-                    Some(piece) => {
-                        fen_string.push(piece.clone().into())
-                    },
-                    None => { fen_string.push('1') }
+                    Some(piece) => fen_string.push(piece.clone().into()),
+                    None => fen_string.push('1'),
                 }
             }
             fen_string.push('/');
@@ -709,18 +721,21 @@ impl Board {
 
         // Find all of the repeating ones and replace them with their total
         let re: Regex = Regex::new(r"(1+)").unwrap();
-        let replacement_map: Vec<(String, usize)> = re.find_iter(&fen_string)
+        let replacement_map: Vec<(String, usize)> = re
+            .find_iter(&fen_string)
             .filter_map(|digits| digits.as_str().parse().ok())
             .map(|x: String| (x.clone(), x.len()))
             .unique()
             .sorted_by(|a, b| a.1.cmp(&b.1))
             .rev()
             .collect();
-        
+
         for (key, value) in replacement_map.iter() {
-            fen_string = fen_string.replace(key, value.to_string().as_str()).to_string();
+            fen_string = fen_string
+                .replace(key, value.to_string().as_str())
+                .to_string();
         }
-        
+
         // Adding the final additional information
         fen_string.push(' ');
         match self.turn_to_play {
@@ -751,7 +766,7 @@ impl Default for Board {
             team_moves: default_hashmap,
             history: Vec::new(),
             turn_to_play: Team::White,
-            winner: None
+            winner: None,
         }
     }
 }
@@ -760,7 +775,7 @@ impl Default for Board {
 pub enum BoardError {
     EmptyCoordinate,
     IllegalMove,
-    NotYourTurn
+    NotYourTurn,
 }
 
 impl std::fmt::Display for Board {
@@ -799,7 +814,7 @@ pub struct HistoryNode {
 /// A Fen representation of the state of a chess board
 #[derive(Debug, Encode, Decode, TypeId, Describe)]
 pub struct Fen {
-    pub state: String
+    pub state: String,
 }
 
 impl Fen {
@@ -809,10 +824,19 @@ impl Fen {
 
     // TODO: this should return a result team to handle the case of incorrect character
     pub fn current_team_turn(&self) -> Team {
-        match self.state.split(' ').nth(1).unwrap().to_string().chars().nth(0).unwrap() {
+        match self
+            .state
+            .split(' ')
+            .nth(1)
+            .unwrap()
+            .to_string()
+            .chars()
+            .nth(0)
+            .unwrap()
+        {
             'w' | 'W' => Team::White,
             'b' | 'B' => Team::Black,
-            _ => panic!("Invalid team")
+            _ => panic!("Invalid team"),
         }
     }
 }
@@ -821,7 +845,7 @@ impl Fen {
 pub enum GameStatus {
     // Denotes a check in a game of chess. The team in this enum is the team whose king is in check.
     Check(Team),
-    
+
     // Denotes a checkmate in a game of chess. The team in this enum is the team whose king is in a checkmate.
     CheckMate(Team),
 

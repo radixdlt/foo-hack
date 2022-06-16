@@ -14,7 +14,7 @@ export package=$(resim publish . | sed -nr "s/Success! New Package: ([[:alnum:]_
 
 CP_OP=$(resim call-function $package RadiChess create)
 export chessmgr=$(echo "$CP_OP" | sed -nr "s/└─ Component: ([[:alnum:]_]+)/\1/p")
-export badgerez=$(echo "$CP_OP" | sed -nr "s/.*Resource: ([[:alnum:]_]+)/\1/p" | sed '2!d')
+export badgerez=$(echo "$CP_OP" | sed -nr "s/.*Resource: ([[:alnum:]_]+)/\1/p" | sed '3!d')
 
 resim set-default-account $redfoo_account $redfoo_privkey
 resim call-method $chessmgr register_player "RedFoo" 1700

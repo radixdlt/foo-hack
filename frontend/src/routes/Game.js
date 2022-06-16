@@ -85,11 +85,12 @@ function Game() {
 
   useEffect(() => {
 
-    if (intervalRef && gameInfo && gameInfo.status === 'Finished') {
-      clearInterval(intervalRef);
+    if (gameInfo && gameInfo.status === 'Finished') {
+      outcomeHandler();
+      if(intervalRef) {
+        clearInterval(intervalRef);
+      }
     }
-
-    outcomeHandler();
 
   }, [gameInfo]);
 
@@ -114,8 +115,6 @@ function Game() {
       },
       current_player_status: null
     };
-
-    console.log(gameInfo)
 
     if (gameInfo.player1.player_id === gameInfo.outcome.Winner ? gameInfo.player1 : gameInfo.player2) {
       results.outcome.winner = gameInfo.player1;
@@ -213,7 +212,7 @@ function Game() {
               </div>
 
             }
-            
+
             <Chessboard position={gameInfo.fen ?? ''} onPieceDrop={onDrop} boardOrientation={setup.orientation} />
             <div className="player-title">{setup.boardBottomTitle}</div>
           </>

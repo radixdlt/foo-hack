@@ -124,7 +124,7 @@ function Game() {
       results.outcome.loser = gameInfo.player2;
     }
 
-    if (!userBadge?.nonFungibleIds[0] || userBadge?.nonFungibleIds[0] !== gameInfo.player1.player_id && userBadge?.nonFungibleIds[0] !== gameInfo.player2.player_id) {
+    if (isSpectator()) {
 
       results.current_player_status = 'spectator';
 
@@ -195,13 +195,25 @@ function Game() {
 
   }
 
+  function isSpectator() {
+
+    if (!userBadge?.nonFungibleIds[0] || userBadge?.nonFungibleIds[0] !== gameInfo.player1.player_id && userBadge?.nonFungibleIds[0] !== gameInfo.player2.player_id) {
+
+      return true;
+
+    }
+
+    return false;
+
+  }
+
   function resultText() {
 
-    if(!gameResults) {
+    if (!gameResults) {
       return '';
     }
 
-    if(gameResults.current_player_status === 'spectator') {
+    if (gameResults.current_player_status === 'spectator') {
       return gameResults.outcome.winner.nickname + ' is the winner!';
     } else if (gameResults.current_player_status === 'win') {
       return 'You Win!';
@@ -230,12 +242,12 @@ function Game() {
             {gameResults &&
 
               <div className="result-image">
-                  <div>{resultText()}</div>                
+                <div>{resultText()}</div>
               </div>
 
             }
 
-            <Chessboard position={gameInfo.fen ?? ''} onPieceDrop={onDrop} boardOrientation={setup.orientation} />
+            <Chessboard position={gameInfo.fen ?? ''} onPieceDrop={onDrop} boardOrientation={setup.orientation} arePiecesDraggable={!isSpectator()} />
             <div className="player-title">{setup.boardBottomTitle}</div>
           </>
         }

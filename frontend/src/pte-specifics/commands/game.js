@@ -74,6 +74,19 @@ const game = {
 
         const receipt = await signTransaction(manifest);
 
+    },
+
+    movePiece: async (gameAddress, from, to) => {
+
+        const manifest = new ManifestBuilder()
+            .createProofFromAccountByAmount(mappings.userAccount.address, '1', mappings.player_badge)
+            .popFromAuthZone('proof1')
+            .callMethod(gameAddress, 'move_piece', [from, to, 'Proof("proof1")'])
+            .build()
+            .toString();
+
+        const receipt = await signTransaction(manifest);
+
     }
 
 };

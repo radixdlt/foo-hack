@@ -70,10 +70,11 @@ blueprint! {
         result_nft_resource: ResourceAddress,
         games: Vec<ComponentAddress>,
         players: Vec<NonFungibleId>,
+        auction_package: PackageAddress,
     }
 
     impl RadiChess {
-        pub fn create() -> ComponentAddress {
+        pub fn create(auction_package: PackageAddress) -> ComponentAddress {
             let service_auth: Bucket = ResourceBuilder::new_fungible().initial_supply(1);
 
             let result_minter_badge = ResourceBuilder::new_fungible()
@@ -109,6 +110,7 @@ blueprint! {
 
             Self {
                 user_resource: radi_chess_user,
+                auction_package,
                 result_minter_badge,
                 result_nft_resource,
                 service_auth: Vault::with_bucket(service_auth),
@@ -120,12 +122,12 @@ blueprint! {
             .globalize()
         }
 
-        pub fn register_player(&mut self, name: String, elo: Decimal) -> Bucket {
+        pub fn register_player(&mut self, name: String, _elo: Decimal) -> Bucket {
             let id = NonFungibleId::from_bytes(name.as_bytes().to_vec());
             self.players.push(id.clone());
             self.service_auth.authorize(|| {
                 borrow_resource_manager!(self.user_resource)
-                    .mint_non_fungible(&id, RadiChessUser::new(name, elo))
+                    .mint_non_fungible(&id, RadiChessUser::new(name, dec!("1500")))
             })
         }
 
@@ -148,6 +150,7 @@ blueprint! {
                 self.result_nft_resource,
                 self.user_resource,
                 result_minter_badge,
+                self.auction_package
             );
 
             self.games.push(component);

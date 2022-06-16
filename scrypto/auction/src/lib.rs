@@ -22,7 +22,7 @@ blueprint! {
     impl Auction {
         pub fn instantiate_auction(bucket:Bucket,duration:u64)-> (ComponentAddress,Bucket) {
             assert!(duration < 500, "That's too long!");
-            
+
             let ticket_authority: Bucket = ResourceBuilder::new_fungible()
                 .divisibility(DIVISIBILITY_NONE)
                 .metadata("name", "Ticket Authority")
@@ -75,11 +75,9 @@ blueprint! {
 
             self.highest_bid = bid.amount();
             self.highest_bid_id = Some(ticket_id); 
-             
 
-             self.bid_vault.put(bid);
-             ticket
-
+            self.bid_vault.put(bid);
+            ticket
         }
         pub fn update_bid(&mut self,ticket:Proof,supplement:Bucket) {
             assert!(self.auction_end_epoch >= Runtime::current_epoch(),"Sorry Charlie. The Action has expired");
@@ -107,7 +105,7 @@ blueprint! {
             assert!(ticket.resource_address() == self.bid_ticket_manager_address,"Stop trying to steal money dude");
             assert!(ticket.amount() > Decimal::zero());
             let ticket_nft: NonFungible<TicketData> = ticket.non_fungible();
-            
+
             let bucket_to_return = if ticket_nft.id() == self.highest_bid_id.clone().unwrap() { 
                 self.nft_vault.take_all()
             } else {

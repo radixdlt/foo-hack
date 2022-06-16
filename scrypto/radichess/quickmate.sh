@@ -10,9 +10,10 @@ OP2=$(resim new-account)
 export rock_privkey=$(echo "$OP2" | sed -nr "s/Private key: ([[:alnum:]_]+)/\1/p")
 export rock_account=$(echo "$OP2" | sed -nr "s/Account component address: ([[:alnum:]_]+)/\1/p")
 
+export auctionPackage=$(cd ../auction && resim publish . | sed -nr "s/Success! New Package: ([[:alnum:]_]+)/\1/p")
 export package=$(resim publish . | sed -nr "s/Success! New Package: ([[:alnum:]_]+)/\1/p")
 
-CP_OP=$(resim call-function $package RadiChess create)
+CP_OP=$(resim call-function $package RadiChess create $auctionPackage)
 export chessmgr=$(echo "$CP_OP" | sed -nr "s/└─ Component: ([[:alnum:]_]+)/\1/p")
 export badgerez=$(echo "$CP_OP" | sed -nr "s/.*Resource: ([[:alnum:]_]+)/\1/p" | sed '3!d')
 
@@ -43,6 +44,17 @@ resim set-default-account $rock_account $rock_privkey
 resim call-method $game1 move_piece "G8" "F6" 1,$badgerez
 
 resim set-default-account $redfoo_account $redfoo_privkey
-resim call-method $game1 move_piece "H5" "F7" 1,$badgerez
+
+FINISHED_OP=$(resim call-method $game1 move_piece "H5" "F7" 1,$badgerez)
+export auctionComponent=$(echo "$FINISHED_OP" | sed -nr "s/└─ Component: ([[:alnum:]_]+)/\1/p")
+
+resim call-method $auctionComponent bid 10,$xrd
+resim set-current-epoch 2
+
+resim call-method $game1 withdraw_auction_winnings 1,$badgerez
+
+resim set-default-account $rock_account $rock_privkey
+resim call-method $game1 withdraw_auction_winnings 1,$badgerez
+
 # resim set-default-account $rock_account $rock_privkey
 # resim call-method $game1 move_piece "A7" "A6" 1,$badgerez

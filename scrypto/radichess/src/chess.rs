@@ -72,7 +72,13 @@ blueprint! {
         result_nft_resource: ResourceAddress,
         result_nft_badge: Vault,
         result_vault: Vault,
+        auction_badge_vault: Option<Vault>,
+        auction_component: Option<ComponentAddress>,
 
+        winner_auction_winnings: Vault,
+        loser_auction_winnings: Vault,
+
+        auction_package: PackageAddress,
         /// The epoch in which the last move was made by the players.
         last_move_epoch: u64,
 
@@ -89,6 +95,7 @@ blueprint! {
             result_nft_resource: ResourceAddress,
             user_resource: ResourceAddress,
             result_nft_badge: Bucket,
+            auction_package: PackageAddress
         ) -> ComponentAddress {
             let service_auth = ResourceBuilder::new_fungible().initial_supply(1);
 
@@ -99,6 +106,9 @@ blueprint! {
             Self {
                 service_auth: Vault::with_bucket(service_auth),
                 result_nft_badge: Vault::with_bucket(result_nft_badge),
+                auction_badge_vault: None,
+                auction_component: None,
+                auction_package,
                 user_resource,
                 badge_resource,
                 player1_id: player1,
@@ -110,6 +120,8 @@ blueprint! {
                 result_nft_resource,
                 result_vault: Vault::new(result_nft_resource),
                 last_move_epoch: Runtime::current_epoch(),
+                winner_auction_winnings: Vault::new(RADIX_TOKEN),
+                loser_auction_winnings: Vault::new(RADIX_TOKEN),
                 underway: false,
                 completed: false,
             }
@@ -210,6 +222,7 @@ blueprint! {
 
                                 if self.get_status() == Status::Finished {
                                     self.update_elo();
+                                    self.mint_game_result();
                                 }
 
                                 info!("Move has been made, current board is: \n{}", self.board);
@@ -301,12 +314,10 @@ blueprint! {
             });
         }
 
-        pub fn mint_game_result(&self) -> Bucket {
-            assert!(self.get_status() == Status::Finished, "Game not finished");
-
+        pub fn mint_game_result(&mut self) {
             let winner = self.get_player_winner();
 
-            self.result_nft_badge.authorize(|| {
+            let auction_nft = self.result_nft_badge.authorize(|| {
                 borrow_resource_manager!(self.result_nft_resource).mint_non_fungible(
                     &NonFungibleId::random(),
                     ChessResultAuctionNFT {
@@ -316,7 +327,39 @@ blueprint! {
                         player2_name: self.player2_id.clone().unwrap().to_string(),
                     },
                 )
-            })
+            });
+
+            let auction_component: (ComponentAddress, Bucket) = borrow_package!(self.auction_package).call("Auction", "instantiate_auction", vec![scrypto_encode(&auction_nft), scrypto_encode(&1u64)]);
+
+            self.auction_badge_vault = Some(Vault::with_bucket(auction_component.1));
+            self.auction_component = Some(auction_component.0);
+        }
+
+        pub fn withdraw_auction_winnings(&mut self, badge: Proof) -> Bucket {
+            assert!(self.auction_badge_vault.is_some(), "Auction not started");
+            assert!(self.get_status() == Status::Finished, "Game not Finished");
+
+            let player_id = badge.non_fungible::<RadiChessUser>().id();
+
+
+            if self.winner_auction_winnings.amount() == Decimal::zero() && self.loser_auction_winnings.amount() == Decimal::zero() {
+                let badge = self.auction_badge_vault.as_mut().unwrap().take(1);
+                let mut xrd_winnings: Bucket = borrow_component!(self.auction_component.unwrap()).call("withdraw_admin", vec![scrypto_encode(&badge)]);
+                let winner_amount = dec!("0.8") * xrd_winnings.amount();
+
+                let win = xrd_winnings.take(winner_amount);
+
+                self.winner_auction_winnings.put(win);
+                self.loser_auction_winnings.put(xrd_winnings);
+            }
+
+            if player_id == self.player1_id && self.board.winner().unwrap() == self.player1_team ||
+                player_id == self.player2_id.clone().unwrap() && self.board.winner().unwrap() == self.player2_team.unwrap()
+            {
+                self.winner_auction_winnings.take_all()
+            } else {
+                self.loser_auction_winnings.take_all()
+            }
         }
 
         pub fn get_players(&self) -> (NonFungibleId, Option<NonFungibleId>) {

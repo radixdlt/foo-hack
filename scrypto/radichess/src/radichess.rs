@@ -1,15 +1,16 @@
 use crate::chess::{Chess, Outcome, Status};
-use scrypto::{prelude::*, component};
+use scrypto::{component, prelude::*};
 use serde::Serialize;
 
 #[derive(Debug, NonFungibleData)]
 pub struct RadiChessUser {
     pub name: String,
-    pub elo: u64,
+    #[scrypto(mutable)]
+    pub elo: Decimal,
 }
 
 impl RadiChessUser {
-    pub fn new(name: String, elo: u64) -> Self {
+    pub fn new(name: String, elo: Decimal) -> Self {
         Self { name, elo }
     }
 }
@@ -23,7 +24,11 @@ pub struct Player {
 
 impl Player {
     pub fn new(nickname: String, elo: String, player_id: String) -> Self {
-        Self { nickname, elo, player_id }
+        Self {
+            nickname,
+            elo,
+            player_id,
+        }
     }
 }
 
@@ -44,7 +49,7 @@ impl GameJSON {
         status: Status,
         player1: Player,
         player2: Option<Player>,
-        fen: Option<String>
+        fen: Option<String>,
     ) -> Self {
         Self {
             game_address,
@@ -52,7 +57,7 @@ impl GameJSON {
             status,
             player1,
             player2,
-            fen
+            fen,
         }
     }
 }
@@ -64,12 +69,19 @@ blueprint! {
         result_minter_badge: ResourceAddress,
         result_nft_resource: ResourceAddress,
         games: Vec<ComponentAddress>,
-        players: Vec<Player>,
+        players: Vec<NonFungibleId>,
     }
 
     impl RadiChess {
         pub fn create() -> ComponentAddress {
             let service_auth: Bucket = ResourceBuilder::new_fungible().initial_supply(1);
+
+            let result_minter_badge = ResourceBuilder::new_fungible()
+                .mintable(
+                    rule!(require(service_auth.resource_address())),
+                    Mutability::LOCKED,
+                )
+                .no_initial_supply();
             // Create a new token called "HelloToken," with a fixed supply of 1000, and put that supply into a bucket
             let radi_chess_user = ResourceBuilder::new_non_fungible()
                 .metadata("name", "RadiChess Player")
@@ -78,21 +90,18 @@ blueprint! {
                     rule!(require(service_auth.resource_address())),
                     Mutability::LOCKED,
                 )
+                .updateable_non_fungible_data(
+                    rule!(require(result_minter_badge)),
+                    Mutability::LOCKED,
+                )
                 .burnable(
                     rule!(require(service_auth.resource_address())),
                     Mutability::LOCKED,
                 )
                 .no_initial_supply();
 
-            let result_minter_badge = ResourceBuilder::new_fungible()
-                .mintable(rule!(require(service_auth.resource_address())), Mutability::LOCKED)
-                .no_initial_supply();
-
             let result_nft_resource = ResourceBuilder::new_non_fungible()
-                .mintable(
-                    rule!(require(result_minter_badge)),
-                    Mutability::LOCKED,
-                )
+                .mintable(rule!(require(result_minter_badge)), Mutability::LOCKED)
                 .restrict_withdraw(rule!(deny_all), Mutability::LOCKED)
                 .no_initial_supply();
 
@@ -111,15 +120,12 @@ blueprint! {
             .globalize()
         }
 
-        pub fn register_player(&mut self, name: String, elo: u64) -> Bucket {
+        pub fn register_player(&mut self, name: String, elo: Decimal) -> Bucket {
             let id = NonFungibleId::from_bytes(name.as_bytes().to_vec());
-            self.players
-                .push(Player::new(name.to_string(), elo.to_string(), id.to_string()));
+            self.players.push(id.clone());
             self.service_auth.authorize(|| {
-                borrow_resource_manager!(self.user_resource).mint_non_fungible(
-                    &id,
-                    RadiChessUser::new(name, elo),
-                )
+                borrow_resource_manager!(self.user_resource)
+                    .mint_non_fungible(&id, RadiChessUser::new(name, elo))
             })
         }
 
@@ -132,11 +138,17 @@ blueprint! {
             // Now create the game and return the game component address
             let player_id = badge.non_fungible::<RadiChessUser>().id();
 
-            let result_minter_badge = self.service_auth.authorize(|| {
-                borrow_resource_manager!(self.result_minter_badge).mint(1)
-            });
+            let result_minter_badge = self
+                .service_auth
+                .authorize(|| borrow_resource_manager!(self.result_minter_badge).mint(1));
 
-            let component = Chess::instantiate(player_id, self.user_resource, self.result_nft_resource, self.user_resource, result_minter_badge);
+            let component = Chess::instantiate(
+                player_id,
+                self.user_resource,
+                self.result_nft_resource,
+                self.user_resource,
+                result_minter_badge,
+            );
 
             self.games.push(component);
 
@@ -163,7 +175,7 @@ blueprint! {
                         Some(Player::new(
                             player2_details.name,
                             player2_details.elo.to_string(),
-                            player2.clone().unwrap().to_string()
+                            player2.clone().unwrap().to_string(),
                         ))
                     } else {
                         None
@@ -173,9 +185,13 @@ blueprint! {
                         c.to_string(),
                         component.get_outcome(),
                         component.get_status(),
-                        Player::new(player1_details.name, player1_details.elo.to_string(), player1.to_string()),
+                        Player::new(
+                            player1_details.name,
+                            player1_details.elo.to_string(),
+                            player1.to_string(),
+                        ),
                         player2_details,
-                        None
+                        None,
                     )
                 })
                 .collect::<Vec<GameJSON>>();
@@ -185,58 +201,14 @@ blueprint! {
             serde_json_wasm::to_string(&found_games).unwrap()
         }
 
-        // pub fn list_games_by_player(&self, badge: Proof) -> String {
-        //     let player_id = badge.non_fungible::<RadiChessUser>().id();
-
-        //     let found_games = self
-        //         .games
-        //         .clone()
-        //         .into_iter()
-        //         .filter(|c| {
-        //             let component: Chess = c.clone().into();
-        //             let (player1, player2) = component.get_players();
-
-        //             match player2 {
-        //                 Some(p) => player_id == p,
-        //                 None => player_id == player1,
-        //             }
-        //         })
-        //         .map(|c| {
-        //             let component: Chess = c.clone().into();
-        //             let (player1, player2) = component.get_players();
-
-        //             let player1_details: RadiChessUser =
-        //                 borrow_resource_manager!(self.user_resource)
-        //                     .get_non_fungible_data(&player1);
-
-        //             let player2_details: Option<Player> = if player2.is_some() {
-        //                 let player2_details: RadiChessUser =
-        //                     borrow_resource_manager!(self.user_resource)
-        //                         .get_non_fungible_data(&player2.unwrap());
-        //                 Some(Player::new(
-        //                     player2_details.name,
-        //                     player2_details.elo.to_string(),
-        //                 ))
-        //             } else {
-        //                 None
-        //             };
-
-        //             GameJSON::new(
-        //                 c.to_string(),
-        //                 Outcome::Undecided,
-        //                 Status::Awaiting,
-        //                 Player::new(player1_details.name, player1_details.elo.to_string()),
-        //                 player2_details,
-        //                 None
-        //             )
-        //         })
-        //         .collect::<Vec<GameJSON>>();
-
-        //     serde_json_wasm::to_string(&found_games).unwrap()
-        // }
-
         pub fn list_players(&self) -> String {
-            serde_json_wasm::to_string(&self.players).unwrap()
+            let players = self.players.iter().map(|id| {
+                let player = borrow_resource_manager!(self.user_resource).get_non_fungible_data::<RadiChessUser>(&id);
+                Player::new(player.name, player.elo.to_string(), id.to_string())
+            })
+            .collect::<Vec<Player>>();
+
+            serde_json_wasm::to_string(&players).unwrap()
         }
     }
 }

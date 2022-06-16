@@ -68,7 +68,7 @@ const game = {
         const manifest = new ManifestBuilder()
             .createProofFromAccountByAmount(mappings.userAccount.address, '1', mappings.player_badge)
             .popFromAuthZone('proof1')
-            .callMethod(gameAddress, 'join_game', ['Proof("proof1")'])
+            .callMethod(gameAddress, 'join', ['Proof("proof1")'])
             .build()
             .toString();
 

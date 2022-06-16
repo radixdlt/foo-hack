@@ -1,5 +1,5 @@
 use crate::chess::{Chess, Outcome, Status};
-use scrypto::prelude::*;
+use scrypto::{prelude::*, component};
 use serde::Serialize;
 
 #[derive(Debug, NonFungibleData)]
@@ -16,13 +16,14 @@ impl RadiChessUser {
 
 #[derive(Debug, Describe, Encode, Decode, TypeId, Serialize)]
 pub struct Player {
+    player_id: String,
     nickname: String,
     elo: String,
 }
 
 impl Player {
-    pub fn new(nickname: String, elo: String) -> Self {
-        Self { nickname, elo }
+    pub fn new(nickname: String, elo: String, player_id: String) -> Self {
+        Self { nickname, elo, player_id }
     }
 }
 
@@ -111,11 +112,12 @@ blueprint! {
         }
 
         pub fn register_player(&mut self, name: String, elo: u64) -> Bucket {
+            let id = NonFungibleId::from_bytes(name.as_bytes().to_vec());
             self.players
-                .push(Player::new(name.to_string(), elo.to_string()));
+                .push(Player::new(name.to_string(), elo.to_string(), id.to_string()));
             self.service_auth.authorize(|| {
                 borrow_resource_manager!(self.user_resource).mint_non_fungible(
-                    &NonFungibleId::from_bytes(name.as_bytes().to_vec()),
+                    &id,
                     RadiChessUser::new(name, elo),
                 )
             })
@@ -157,10 +159,11 @@ blueprint! {
                     let player2_details: Option<Player> = if player2.is_some() {
                         let player2_details: RadiChessUser =
                             borrow_resource_manager!(self.user_resource)
-                                .get_non_fungible_data(&player2.unwrap());
+                                .get_non_fungible_data(&player2.clone().unwrap());
                         Some(Player::new(
                             player2_details.name,
                             player2_details.elo.to_string(),
+                            player2.clone().unwrap().to_string()
                         ))
                     } else {
                         None
@@ -168,9 +171,9 @@ blueprint! {
 
                     GameJSON::new(
                         c.to_string(),
-                        Outcome::Undecided,
-                        Status::Awaiting,
-                        Player::new(player1_details.name, player1_details.elo.to_string()),
+                        component.get_outcome(),
+                        component.get_status(),
+                        Player::new(player1_details.name, player1_details.elo.to_string(), player1.to_string()),
                         player2_details,
                         None
                     )
@@ -182,55 +185,55 @@ blueprint! {
             serde_json_wasm::to_string(&found_games).unwrap()
         }
 
-        pub fn list_games_by_player(&self, badge: Proof) -> String {
-            let player_id = badge.non_fungible::<RadiChessUser>().id();
+        // pub fn list_games_by_player(&self, badge: Proof) -> String {
+        //     let player_id = badge.non_fungible::<RadiChessUser>().id();
 
-            let found_games = self
-                .games
-                .clone()
-                .into_iter()
-                .filter(|c| {
-                    let component: Chess = c.clone().into();
-                    let (player1, player2) = component.get_players();
+        //     let found_games = self
+        //         .games
+        //         .clone()
+        //         .into_iter()
+        //         .filter(|c| {
+        //             let component: Chess = c.clone().into();
+        //             let (player1, player2) = component.get_players();
 
-                    match player2 {
-                        Some(p) => player_id == p,
-                        None => player_id == player1,
-                    }
-                })
-                .map(|c| {
-                    let component: Chess = c.clone().into();
-                    let (player1, player2) = component.get_players();
+        //             match player2 {
+        //                 Some(p) => player_id == p,
+        //                 None => player_id == player1,
+        //             }
+        //         })
+        //         .map(|c| {
+        //             let component: Chess = c.clone().into();
+        //             let (player1, player2) = component.get_players();
 
-                    let player1_details: RadiChessUser =
-                        borrow_resource_manager!(self.user_resource)
-                            .get_non_fungible_data(&player1);
+        //             let player1_details: RadiChessUser =
+        //                 borrow_resource_manager!(self.user_resource)
+        //                     .get_non_fungible_data(&player1);
 
-                    let player2_details: Option<Player> = if player2.is_some() {
-                        let player2_details: RadiChessUser =
-                            borrow_resource_manager!(self.user_resource)
-                                .get_non_fungible_data(&player2.unwrap());
-                        Some(Player::new(
-                            player2_details.name,
-                            player2_details.elo.to_string(),
-                        ))
-                    } else {
-                        None
-                    };
+        //             let player2_details: Option<Player> = if player2.is_some() {
+        //                 let player2_details: RadiChessUser =
+        //                     borrow_resource_manager!(self.user_resource)
+        //                         .get_non_fungible_data(&player2.unwrap());
+        //                 Some(Player::new(
+        //                     player2_details.name,
+        //                     player2_details.elo.to_string(),
+        //                 ))
+        //             } else {
+        //                 None
+        //             };
 
-                    GameJSON::new(
-                        c.to_string(),
-                        Outcome::Undecided,
-                        Status::Awaiting,
-                        Player::new(player1_details.name, player1_details.elo.to_string()),
-                        player2_details,
-                        None
-                    )
-                })
-                .collect::<Vec<GameJSON>>();
+        //             GameJSON::new(
+        //                 c.to_string(),
+        //                 Outcome::Undecided,
+        //                 Status::Awaiting,
+        //                 Player::new(player1_details.name, player1_details.elo.to_string()),
+        //                 player2_details,
+        //                 None
+        //             )
+        //         })
+        //         .collect::<Vec<GameJSON>>();
 
-            serde_json_wasm::to_string(&found_games).unwrap()
-        }
+        //     serde_json_wasm::to_string(&found_games).unwrap()
+        // }
 
         pub fn list_players(&self) -> String {
             serde_json_wasm::to_string(&self.players).unwrap()

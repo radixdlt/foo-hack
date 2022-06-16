@@ -117,6 +117,7 @@ blueprint! {
                 Some(Player::new(
                         player2_details.name,
                         player2_details.elo.to_string(),
+                        self.player2_id.clone().unwrap().to_string()
                 ))
             } else {
                 None
@@ -124,9 +125,9 @@ blueprint! {
 
             let game = GameJSON::new(
                 Runtime::actor().component_address().unwrap().to_string(),
-                Outcome::Undecided,
-                Status::Awaiting,
-                Player::new(player1_details.name, player1_details.elo.to_string()),
+                self.get_outcome(),
+                self.get_status(),
+                Player::new(player1_details.name, player1_details.elo.to_string(), self.player1_id.to_string()),
                 player2_details,
                 Some(self.get_fen())
             );

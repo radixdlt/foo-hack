@@ -87,7 +87,7 @@ function Game() {
 
     if (gameInfo && gameInfo.status === 'Finished') {
       outcomeHandler();
-      if(intervalRef) {
+      if (intervalRef) {
         clearInterval(intervalRef);
       }
     }
@@ -124,7 +124,15 @@ function Game() {
       results.outcome.loser = gameInfo.player2;
     }
 
-    results.current_player_status = userBadge.nonFungibleIds[0] === results.outcome.winner.player_id ? 'win' : 'loss';
+    if (!userBadge?.nonFungibleIds[0] || userBadge?.nonFungibleIds[0] !== gameInfo.player1.player_id && userBadge?.nonFungibleIds[0] !== gameInfo.player2.player_id) {
+
+      results.current_player_status = 'spectator';
+
+    } else {
+
+      results.current_player_status = userBadge?.nonFungibleIds[0] === results.outcome.winner.player_id ? 'win' : 'loss';
+
+    }
 
     setGameResults(results);
 
@@ -187,6 +195,24 @@ function Game() {
 
   }
 
+  function resultText() {
+
+    if(!gameResults) {
+      return '';
+    }
+
+    if(gameResults.current_player_status === 'spectator') {
+      return gameResults.outcome.winner.nickname + ' is the winner!';
+    } else if (gameResults.current_player_status === 'win') {
+      return 'You Win!';
+    } else if (gameResults.current_player_status === 'loss') {
+      return 'You Lose!';
+    }
+
+    return '';
+
+  }
+
   const setup = chessboardSetup(gameInfo?.player1?.player_id, mappings?.userAccount?.player_badge?.nonFungibleIds?.[0],
     { player1: gameInfo?.player1?.nickname ?? 'Not Set', player2: gameInfo?.player2?.nickname }
   );
@@ -204,11 +230,7 @@ function Game() {
             {gameResults &&
 
               <div className="result-image">
-                {gameResults.current_player_status === 'win' ?
-                  <div>You Win!</div>
-                  :
-                  <div>You Lose!</div>
-                }
+                  <div>{resultText()}</div>                
               </div>
 
             }

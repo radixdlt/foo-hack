@@ -105,7 +105,7 @@ blueprint! {
             .globalize()
         }
 
-        pub fn get_game_info(&self) {
+        pub fn get_game_info(&self) -> String {
             let player1_details: RadiChessUser =
                 borrow_resource_manager!(self.user_resource)
                 .get_non_fungible_data(&self.player1_id);
@@ -122,7 +122,7 @@ blueprint! {
                 None
             };
 
-            GameJSON::new(
+            let game = GameJSON::new(
                 Runtime::actor().component_address().unwrap().to_string(),
                 Outcome::Undecided,
                 Status::Awaiting,
@@ -130,6 +130,8 @@ blueprint! {
                 player2_details,
                 Some(self.get_fen())
             );
+
+            serde_json_wasm::to_string(&game).unwrap()
         }
 
         pub fn join(&mut self, badge: Proof) {

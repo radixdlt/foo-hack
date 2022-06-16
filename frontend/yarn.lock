@@ -3260,6 +3260,11 @@ check-types@^11.1.1:
   resolved "https://registry.yarnpkg.com/check-types/-/check-types-11.1.2.tgz#86a7c12bf5539f6324eb0e70ca8896c0e38f3e2f"
   integrity sha512-tzWzvgePgLORb9/3a0YenggReLKAIb2owL03H2Xdoe5pKcUyWRSEQ8xfCar8t2SIAuEDwtmx2da1YB52YuHQMQ==
 
+chess.js@^0.13.2:
+  version "0.13.2"
+  resolved "https://registry.yarnpkg.com/chess.js/-/chess.js-0.13.2.tgz#a917667a5bc79c5de325fe7da8c479e3959b30fd"
+  integrity sha512-MVr9IfU1ZhyPMAW4BfwsgeSyB9sliREiWhpimNDZN0Q6JMmb9W0drGlUvemqheqkVGa+/FgypLv/FexUBLBTow==
+
 chokidar@^3.4.2, chokidar@^3.5.3:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.5.3.tgz#1cf37c8707b932bd1af1ae22c0432e2acd1903bd"

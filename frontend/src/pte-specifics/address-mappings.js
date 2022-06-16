@@ -1,9 +1,9 @@
  const mappings = {
   
     userAccount: {},
-    package: "01c4b2ff3a2389474ee19792f05de596dead3691d0ac2c0ee3e3a6",
-    component: "02622777b79813852f744036d2a31441956d696b57dad15006de3d",
-    player_badge: "03203c5cb0c28dbfb97a03bd16180c50f2a6688b5716d49ad1f28b",
+    package: "0115817bf55359bb984fa873bbf99eb4a7e225d3716f90be5e29fe",
+    component: "020d3b7d9c4a9bfee86630b5598c5396d202e4e798e042e11aeb9d",
+    player_badge: "03ac5b61c1874e21d7a5348735b08114252279cfde41f74877d100",
     blueprint: ""
     
 };

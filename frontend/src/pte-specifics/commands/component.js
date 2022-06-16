@@ -18,7 +18,7 @@ const component = {
             component: receipt.newComponents[0],
             resources: {
                 chess: receipt.newResources[0],
-                player_badge: receipt.newResources[1]
+                player_badge: receipt.newResources[2]
             }
 
         };

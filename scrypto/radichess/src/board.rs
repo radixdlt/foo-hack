@@ -620,9 +620,7 @@ impl Board {
                                     }
                                 }
                             }
-                            None => {
-                                legal_moves.insert(single_coordinate, None);
-                            }
+                            None => { }
                         },
                         Err(_) => {}
                     }

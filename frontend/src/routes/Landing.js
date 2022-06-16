@@ -36,7 +36,23 @@ function a11yProps(index) {
   };
 }
 
-function GameList({ games, type }) {
+function isGameInvolved(userBadge, gameInfo) {
+
+  if (!userBadge) {
+    return false;
+  }
+
+  if (userBadge?.nonFungibleIds[0] && (userBadge?.nonFungibleIds[0] === gameInfo?.player1?.player_id || userBadge?.nonFungibleIds[0] === gameInfo?.player2?.player_id)) {
+
+    return true;
+
+  }
+
+  return false;
+
+}
+
+function GameList({ games, type, userBadge = null }) {
 
   const navigate = useNavigate();
 
@@ -44,7 +60,7 @@ function GameList({ games, type }) {
 
     const joinResult = await game.joinGame(gameAddress);
 
-    if(!joinResult) {
+    if (!joinResult) {
       return null;
     }
 
@@ -52,13 +68,17 @@ function GameList({ games, type }) {
 
   }
 
-  if (!games.games) {
+  if (!games) {
     return null;
   }
 
-  const reducedList = games.games.filter((game) => {
+  const reducedList = games.filter((game) => {
 
-    return game.status === type;
+    if (userBadge && isGameInvolved(userBadge, game) && type === 'MyGames') {
+      return true;
+    } else if (userBadge && !isGameInvolved(userBadge, game)) {
+      return game.status === type;
+    }
 
   });
 
@@ -90,14 +110,36 @@ function GameList({ games, type }) {
       )
       :
       <>
-        <div>No Games.</div>
+        <div>
+          {type === 'MyGames' ?
+
+            'You have no games currently in progress.'
+
+            : type === 'InProgress' ?
+
+              'No games are currently in progress.'
+
+              : type === 'Awaiting' ?
+
+                'No games are currently available to join.'
+
+                : type === 'Finished' ?
+
+                  'No results are available.'
+
+                  :
+
+                  ''
+
+          }
+        </div>
       </>
 
   );
 
 }
 
-function GameTabs(games) {
+function GameTabs({ games, userBadge }) {
 
   const [value, setValue] = useState(0);
 
@@ -109,31 +151,33 @@ function GameTabs(games) {
     <Box sx={{ width: '100%', margin: 'auto', marginTop: '40px' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="RadiChess Menu">
-          <Tab label="My Games" {...a11yProps(0)} />
+          <Tab label="Games in Progress" {...a11yProps(0)} />
           <Tab label="Join Game" {...a11yProps(1)} />
-          <Tab label="Games in Progress" {...a11yProps(2)} />
+          <Tab label="My Games" {...a11yProps(2)} />
           <Tab label="Results" {...a11yProps(3)} />
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
-        <>
-          <GameList games={games} type="MyGames" />
-          <Button variant="contained" sx={{ marginTop: '20px' }} onClick={() => game.create()}>Create New Game</Button>
-        </>
+
+        <GameList games={games} type="InProgress" userBadge={userBadge} />
+
       </TabPanel>
       <TabPanel value={value} index={1}>
 
-        <GameList games={games} type="Awaiting" />
+        <GameList games={games} type="Awaiting" userBadge={userBadge} />
 
       </TabPanel>
       <TabPanel value={value} index={2}>
 
-        <GameList games={games} type="InProgress" />
+        <>
+          <GameList games={games} type="MyGames" userBadge={userBadge} />
+          <Button variant="contained" sx={{ marginTop: '20px' }} onClick={() => game.create()}>Create New Game</Button>
+        </>
 
       </TabPanel>
       <TabPanel value={value} index={3}>
 
-        <GameList games={games} type="Finshed" />
+        <GameList games={games} type="Finished" userBadge={userBadge} />
 
       </TabPanel>
     </Box>
@@ -144,6 +188,7 @@ function Landing() {
 
   const [userBadge, setBadge] = useState(null);
   const [games, setGames] = useState(null);
+  const [uNickname, setUNickname] = useState(null);
 
   const [modalOpen, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -169,6 +214,16 @@ function Landing() {
 
   }, [userBadge]);
 
+  useEffect(() => {
+
+    if (!uNickname) {
+      return;
+    }
+
+    getGames();
+
+  }, [uNickname]);
+
   async function getBadge() {
 
     const getUserAccount = await account.fetch();
@@ -179,7 +234,6 @@ function Landing() {
     console.log(getUserAccount);
 
     mappings.userAccount = getUserAccount;
-
     setBadge(getUserAccount.player_badge);
 
   }
@@ -198,6 +252,12 @@ function Landing() {
       nickname: inputVal
     });
 
+    // if (userBadgeReceipt) {
+
+    //   setUNickname(true);
+
+    // }
+
   }
 
   return (
@@ -210,12 +270,14 @@ function Landing() {
             <Box textAlign="center" marginTop="30px">
               <Button variant="contained" onClick={handleOpen}>Create Profile</Button>
             </Box>
-            <CreateAccountModal open={modalOpen} handleClose={handleClose} handleSubmit={handleNicknameSubmit} />
+            {!uNickname &&
+              <CreateAccountModal open={modalOpen} handleClose={handleClose} handleSubmit={handleNicknameSubmit} />
+            }
           </>
         }
 
         {userBadge &&
-          <GameTabs games={games} />
+          <GameTabs games={games} userBadge={userBadge} />
         }
 
       </div>

@@ -47,16 +47,16 @@ const account = {
     createBadge: async ({ accountAddress, nickname }) => {
    
         const manifest = new ManifestBuilder()
-            .callMethod(mappings.component, 'register_player', [`"${nickname}"`, '1300u64'])
+            .callMethod(mappings.component, 'register_player', [`"${nickname}"`, 'Decimal("1300")'])
             .callMethodWithAllResources(accountAddress, 'deposit_batch')
             .build()
             .toString();
 
-        console.log(manifest)
+            console.log(manifest);
 
         const receipt = await signTransaction(manifest);
 
-        console.log(JSON.stringify(receipt, null, 2));
+            console.log(receipt)
 
     }
 

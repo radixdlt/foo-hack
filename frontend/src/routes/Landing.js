@@ -252,11 +252,11 @@ function Landing() {
       nickname: inputVal
     });
 
-    if (userBadgeReceipt) {
+    // if (userBadgeReceipt) {
 
-      setUNickname(true);
+    //   setUNickname(true);
 
-    }
+    // }
 
   }
 

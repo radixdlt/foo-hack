@@ -1,5 +1,5 @@
 import React from 'react';
-import Landing from './routes/Landing';
+import Landing from './routes/Landing/Landing';
 import Admin from './routes/Admin';
 import Game from './routes/Game';
 import Leaderboard from './routes/Leaderboard';

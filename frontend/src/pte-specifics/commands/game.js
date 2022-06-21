@@ -51,7 +51,7 @@ const game = {
             transaction: {
                 manifest: manifest,
                 nonce: {
-                    value: Math.round(Math.random()*1000000)
+                    value: Math.round(Math.random()*1000000) // Scrypto Bug Workaround
                 },
                 signatures: []
             }

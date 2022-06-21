@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import '../App.css';
+import '../../App.css';
 
 import { Box, Tabs, Tab, Typography, Button } from '@mui/material';
 import { useNavigate } from "react-router-dom";
-import account from '../pte-specifics/commands/account';
-import game from '../pte-specifics/commands/game';
-import CreateAccountModal from '../components/CreateAccountModal';
-import mappings from '../pte-specifics/address-mappings';
+import account from '../../pte-specifics/commands/account';
+import game from '../../pte-specifics/commands/game';
+import CreateAccountModal from '../../components/CreateAccountModal';
+import mappings from '../../pte-specifics/address-mappings';
+import Loader from '../../components/Loader';
 
 function TabPanel(props) {
 
@@ -49,6 +50,14 @@ function isGameInvolved(userBadge, gameInfo) {
   }
 
   return false;
+
+}
+
+async function createGame(navigate) {
+
+  const gameInstance = await game.create();
+
+  //navigate(`/game/${gameInstance.address}`);
 
 }
 
@@ -147,6 +156,8 @@ function GameTabs({ games, userBadge }) {
     setValue(newValue);
   };
 
+  const navigate = useNavigate();
+
   return (
     <Box sx={{ width: '100%', margin: 'auto', marginTop: '40px' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -171,7 +182,7 @@ function GameTabs({ games, userBadge }) {
 
         <>
           <GameList games={games} type="MyGames" userBadge={userBadge} />
-          <Button variant="contained" sx={{ marginTop: '20px' }} onClick={() => game.create()}>Create New Game</Button>
+          <Button variant="contained" sx={{ marginTop: '20px' }} onClick={() => createGame(navigate)}>Create New Game</Button>
         </>
 
       </TabPanel>
@@ -188,7 +199,7 @@ function Landing() {
 
   const [userBadge, setBadge] = useState(null);
   const [games, setGames] = useState(null);
-  const [uNickname, setUNickname] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [modalOpen, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -199,7 +210,6 @@ function Landing() {
     setTimeout(() => {
 
       getBadge();
-      getGames();
 
     }, 500);
 
@@ -207,6 +217,8 @@ function Landing() {
   }, []);
 
   useEffect(() => {
+
+    getGames();
 
     if (!userBadge) {
       return;
@@ -216,13 +228,11 @@ function Landing() {
 
   useEffect(() => {
 
-    if (!uNickname) {
-      return;
+    if(games !== null) {
+      setIsLoading(false);
     }
 
-    getGames();
-
-  }, [uNickname]);
+  }, [games]);
 
   async function getBadge() {
 
@@ -247,16 +257,12 @@ function Landing() {
 
   async function handleNicknameSubmit(inputVal) {
 
-    const userBadgeReceipt = await account.createBadge({
+    await account.createBadge({
       accountAddress: mappings.userAccount.address,
       nickname: inputVal
     });
 
-    // if (userBadgeReceipt) {
-
-    //   setUNickname(true);
-
-    // }
+    getBadge();
 
   }
 
@@ -265,18 +271,20 @@ function Landing() {
       <h2 className="header">Welcome to RadiChess!</h2>
       <div className="constrained-container">
 
-        {!userBadge &&
+        <Loader visible={isLoading} />
+
+        {!isLoading && !userBadge &&
           <>
             <Box textAlign="center" marginTop="30px">
               <Button variant="contained" onClick={handleOpen}>Create Profile</Button>
             </Box>
-            {!uNickname &&
+            {!userBadge &&
               <CreateAccountModal open={modalOpen} handleClose={handleClose} handleSubmit={handleNicknameSubmit} />
             }
           </>
         }
 
-        {userBadge &&
+        {!isLoading && userBadge &&
           <GameTabs games={games} userBadge={userBadge} />
         }
 

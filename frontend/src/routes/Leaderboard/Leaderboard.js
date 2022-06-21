@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AppBar, Box, Toolbar, Button } from '@mui/material';
-import player from '../pte-specifics/commands/player';
-import '../App.css';
+import player from '../../pte-specifics/commands/player';
+import '../../App.css';
 
 
 function ButtonAppBar() {
@@ -48,7 +48,8 @@ function PlayerList({ players }) {
     const [players, setPlayers] = useState(null);
 
     async function getPlayers() {
-        var players = await player.listPlayers();
+
+        const players = await player.listPlayers();
 
         players = players.sort(function(a, b) {
             if(parseInt(a.elo) < parseInt(b.elo) ) {

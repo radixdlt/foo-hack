@@ -1,33 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import '../App.css';
+import { useParams } from 'react-router-dom';
+
+
+import { game, account } from '../../pte-specifics/commands';
+import mappings from '../../pte-specifics/address-mappings';
+
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
-import { useParams, useNavigate } from 'react-router-dom';
-import { AppBar, Box, Toolbar, Button } from '@mui/material';
-import game from '../pte-specifics/commands/game';
-import account from '../pte-specifics/commands/account';
-import mappings from '../pte-specifics/address-mappings';
+
+import './Game.styles.scss';
+import Header from '../../components/Header';
+import { parsePlayerId } from '../../pte-specifics/helpers/badge.helpers';
 
 let intervalRef = null;
 
-function ButtonAppBar() {
+// Idea - Use websockets to connect both clients and simply refer to the ledger for verification of data.
 
-  const navigate = useNavigate();
+function chessboardSetup({ creatorId, playerId, nicknames }) {
 
-  return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Button color="inherit" onClick={() => navigate('/')}>Back</Button>
-        </Toolbar>
-      </AppBar>
-    </Box>
-  );
-}
-
-function chessboardSetup(playerID, nonFungIds, nicknames) {
-
-  if (playerID === nonFungIds) {
+  if (creatorId === playerId) {
 
     return {
       orientation: 'black',
@@ -52,7 +43,7 @@ function Game() {
   const params = useParams();
   const [gameInfo, setGameInfo] = useState(null);
   const [userBadge, setBadge] = useState(null);
-  const [gameInstance, setGameInstance] = useState(new Chess());
+  const [, setGameInstance] = useState(new Chess());
   const [gameResults, setGameResults] = useState(null);
 
   useEffect(() => {
@@ -72,7 +63,7 @@ function Game() {
     }
 
     const infoPoll = setInterval(() => {
-      getGameInfo(params.gameAddress);
+      getGameInfo({ gameAddress: params.gameAddress });
     }, 5000);
 
     intervalRef = infoPoll;
@@ -138,7 +129,7 @@ function Game() {
 
   }
 
-  async function getGameInfo(gameAddress) {
+  async function getGameInfo({ gameAddress }) {
 
     const gameInfo = await game.getGameInfo(gameAddress);
     setGameInfo(gameInfo);
@@ -172,6 +163,13 @@ function Game() {
 
     safeGameMutate(async (gameInst) => {
 
+      // Todo - Re-enable frontend move validation.
+      // Todo - Ensure that piece movement is consistent (don't update state until component response).
+      // Todo - Add the alternate final results.
+      // Todo - Add the rewards / NFT auction mech.
+      // Todo - Customise board and pieces.
+      // Todo - Detect if wallet / account is not present.
+
       // move = gameInst.move({
       //   from: sourceSquare,
       //   to: targetSquare,
@@ -197,7 +195,9 @@ function Game() {
 
   function isSpectator() {
 
-    if (!userBadge?.nonFungibleIds[0] || userBadge?.nonFungibleIds[0] !== gameInfo.player1.player_id && userBadge?.nonFungibleIds[0] !== gameInfo.player2.player_id) {
+    const userId = parsePlayerId(userBadge);
+
+    if (!userId || userId !== gameInfo.player1.player_id && userId !== gameInfo.player2.player_id) {
 
       return true;
 
@@ -231,13 +231,18 @@ function Game() {
 
   }
 
-  const setup = chessboardSetup(gameInfo?.player1?.player_id, mappings?.userAccount?.player_badge?.nonFungibleIds?.[0],
-    { player1: gameInfo?.player1?.nickname ?? 'Not Set', player2: gameInfo?.player2?.nickname }
-  );
+  const setup = chessboardSetup({
+    creatorId: gameInfo?.player1?.player_id,
+    playerId: parsePlayerId(mappings?.userAccount?.player_badge),
+    nicknames: {
+      player1: gameInfo?.player1?.nickname ?? 'Not Set',
+      player2: gameInfo?.player2?.nickname ?? 'Not Set'
+    }
+  });
 
   return (
     <>
-      <ButtonAppBar />
+      <Header backButton={{ title: 'Back', route: '/' }} />
       <div className="board-outer">
         {!gameInfo || !userBadge ?
           <div className="player-title">Loading</div>

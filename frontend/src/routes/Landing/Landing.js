@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import account from '../../pte-specifics/commands/account';
 import game from '../../pte-specifics/commands/game';
 import CreateAccountModal from '../../components/CreateAccountModal';
-import mappings from '../../pte-specifics/address-mappings';
+import { USER } from '../../pte-specifics/address-mappings';
 import Loader from '../../components/Loader';
 
 function TabPanel(props) {
@@ -243,7 +243,7 @@ function Landing() {
     console.log('User Account ↴');
     console.log(getUserAccount);
 
-    mappings.userAccount = getUserAccount;
+    USER.account = getUserAccount;
     setBadge(getUserAccount.player_badge);
 
   }
@@ -258,7 +258,7 @@ function Landing() {
   async function handleNicknameSubmit(inputVal) {
 
     await account.createBadge({
-      accountAddress: mappings.userAccount.address,
+      accountAddress: USER.account.address,
       nickname: inputVal
     });
 

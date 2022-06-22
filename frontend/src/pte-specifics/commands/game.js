@@ -1,6 +1,6 @@
 import { ManifestBuilder, DefaultApi } from 'pte-sdk';
 import { signTransaction } from 'pte-browser-extension-sdk';
-import mappings from '../address-mappings';
+import { CHESS, USER } from '../address-mappings';
 
 const api = new DefaultApi();
 
@@ -9,9 +9,9 @@ const game = {
     create: async () => {
 
         const manifest = new ManifestBuilder()
-            .createProofFromAccountByAmount(mappings.userAccount.address, '1', mappings.player_badge)
+            .createProofFromAccountByAmount(USER.account.address, '1', USER.account.player_badge)
             .popFromAuthZone('proof1')
-            .callMethod(mappings.component, 'start_game', ['Proof("proof1")', '1300u64'])
+            .callMethod(CHESS.component, 'start_game', ['Proof("proof1")', '1300u64'])
             .build()
             .toString();
 
@@ -22,7 +22,7 @@ const game = {
     viewGames: async () => {
 
         const manifest = new ManifestBuilder()
-            .callMethod(mappings.component, 'list_games', [])
+            .callMethod(CHESS.component, 'list_games', [])
             .build()
             .toString();
 
@@ -64,7 +64,7 @@ const game = {
     joinGame: async (gameAddress) => {
 
         const manifest = new ManifestBuilder()
-            .createProofFromAccountByAmount(mappings.userAccount.address, '1', mappings.player_badge)
+            .createProofFromAccountByAmount(USER.account.address, '1', USER.account.player_badge)
             .popFromAuthZone('proof1')
             .callMethod(gameAddress, 'join', ['Proof("proof1")'])
             .build()
@@ -77,7 +77,7 @@ const game = {
     movePiece: async (gameAddress, from, to) => {
 
         const manifest = new ManifestBuilder()
-            .createProofFromAccountByAmount(mappings.userAccount.address, '1', mappings.player_badge)
+            .createProofFromAccountByAmount(USER.account.address, '1', USER.account.player_badge)
             .popFromAuthZone('proof1')
             .callMethod(gameAddress, 'move_piece', [`"${from}"`, `"${to}"`, 'Proof("proof1")'])
             .build()

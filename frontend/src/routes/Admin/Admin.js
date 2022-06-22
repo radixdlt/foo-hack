@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Box, Button } from '@mui/material';
 
 import { component, sc_package } from '../../pte-specifics/commands';
-import mappings from '../../pte-specifics/address-mappings';
 
 let chessPackage = {};
 
@@ -19,12 +18,11 @@ async function publish({ setter }) {
 
 async function instantiate({ setter }) {
 
-  const radichessBlueprint = await component.instantiate(chessPackage.address);
-  mappings.blueprint = radichessBlueprint;
+  const instance = await component.instantiate(chessPackage.address);
   console.log('Component Instantiated ↴');
-  console.log(radichessBlueprint);
+  console.log(instance);
 
-  setter(radichessBlueprint);
+  setter(instance);
 
   return;
 

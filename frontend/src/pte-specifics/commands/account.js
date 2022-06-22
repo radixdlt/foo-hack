@@ -1,6 +1,6 @@
 import { DefaultApi, ManifestBuilder } from 'pte-sdk';
 import { getAccountAddress, signTransaction } from 'pte-browser-extension-sdk';
-import mappings from '../address-mappings';
+import { CHESS } from '../address-mappings';
 import { getBadgeFromResources, parsePlayerId } from '../helpers/badge.helpers';
 
 const api = new DefaultApi();
@@ -23,7 +23,7 @@ const account = {
 
         const badge = getBadgeFromResources({
             accountResources: accountResources?.ownedResources,
-            badgeMapping: mappings?.player_badge
+            badgeMapping: CHESS?.game_badge
         });
 
         if (!badge) {
@@ -59,7 +59,7 @@ const account = {
         try {
 
             const manifest = new ManifestBuilder()
-                .callMethod(mappings.component, 'register_player', [`"${nickname}"`, 'Decimal("1300")'])
+                .callMethod(CHESS.component, 'register_player', [`"${nickname}"`, 'Decimal("1300")'])
                 .callMethodWithAllResources(accountAddress, 'deposit_batch')
                 .build()
                 .toString();

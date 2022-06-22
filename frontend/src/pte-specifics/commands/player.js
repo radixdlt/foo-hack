@@ -1,5 +1,5 @@
 import { ManifestBuilder, DefaultApi } from 'pte-sdk';
-import mappings from '../address-mappings';
+import { CHESS } from '../address-mappings';
 
 const api = new DefaultApi();
 
@@ -8,7 +8,7 @@ const player = {
     listPlayers: async () => {
 
         const manifest = new ManifestBuilder()
-            .callMethod(mappings.component, 'list_players', [])
+            .callMethod(CHESS.component, 'list_players', [])
             .build()
             .toString();
 

@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 
 
 import { game, account } from '../../pte-specifics/commands';
-import mappings from '../../pte-specifics/address-mappings';
+import { USER } from '../../pte-specifics/address-mappings';
 
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
@@ -145,7 +145,7 @@ function Game() {
     console.log('User Account ↴');
     console.log(getUserAccount);
 
-    mappings.userAccount = getUserAccount;
+    USER.account = getUserAccount;
 
     setBadge(getUserAccount.player_badge);
 
@@ -233,7 +233,7 @@ function Game() {
 
   const setup = chessboardSetup({
     creatorId: gameInfo?.player1?.player_id,
-    playerId: parsePlayerId(mappings?.userAccount?.player_badge),
+    playerId: parsePlayerId(USER.account?.player_badge),
     nicknames: {
       player1: gameInfo?.player1?.nickname ?? 'Not Set',
       player2: gameInfo?.player2?.nickname ?? 'Not Set'

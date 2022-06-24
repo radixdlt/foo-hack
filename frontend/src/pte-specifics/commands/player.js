@@ -16,7 +16,7 @@ const player = {
             transaction: {
                 manifest: manifest,
                 nonce: {
-                    value: Math.round(Math.random()*100000)
+                    value: Math.round(Math.random() * 100000)
                 },
                 signatures: []
             }
@@ -25,10 +25,21 @@ const player = {
         return JSON.parse(JSON.parse(results.outputs[0]).value);
 
     },
-    
-    getBadge: async () => {
 
-        
+    getBadge: async (callback = false) => {
+
+        const account = await account.fetch();
+
+        // Todo - if account is undefined, ask the use to create an account via the extension
+
+        console.log('User Account ↴');
+        console.log(account);
+
+        if (callback) {
+            callback(account.player_badge);
+        }
+
+        return account.player_badge;
 
     }
 

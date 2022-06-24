@@ -1,4 +1,8 @@
-function parsePlayerId({ badge }) {
+function getPlayerId({ badge }) {
+
+    if (!badge) {
+        return null;
+    }
 
     return badge?.nonFungibleIds?.[0] ?? null;
 
@@ -6,7 +10,7 @@ function parsePlayerId({ badge }) {
 
 function getBadgeFromResources({ accountResources, badgeMapping }) {
 
-    if(!accountResources || !badgeMapping) {
+    if (!accountResources || !badgeMapping) {
         return null;
     }
 
@@ -18,4 +22,4 @@ function getBadgeFromResources({ accountResources, badgeMapping }) {
 
 }
 
-export { parsePlayerId, getBadgeFromResources };
+export { getPlayerId, getBadgeFromResources };

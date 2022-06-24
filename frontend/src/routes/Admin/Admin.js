@@ -36,21 +36,21 @@ function AddressItem({ title = '', addresses = null, setAddress, text, styles, a
 
   }
 
-  return <div style={styles}><strong>{title} Addresses:</strong><p>{JSON.stringify(addresses)}</p></div>;
+  return <div style={styles}><strong>{title} Addresses:</strong><p>{addresses}</p></div>;
 
 }
 
 function Admin() {
 
-  const [packageAddresses, setPackageAddresses] = useState('');
-  const [componentAddresses, setComponentAddresses] = useState('');
+  const [packageAddress, setPackageAddress] = useState('');
+  const [componentAddress, setComponentAddress] = useState('');
 
   return (
-    <Box sx={{ maxWidth: '50%', display: 'flex', flexDirection: 'column', margin: 'auto', flexWrap: 'wrap' }}>
+    <Box sx={{ maxWidth: '300px', display: 'flex', flexDirection: 'column', margin: 'auto', flexWrap: 'wrap' }}>
 
-      <AddressItem title='Package' addresses={packageAddresses} setAddress={setPackageAddresses} text='Publish Package' styles={{ marginTop: '40px', wordBreak: 'break-all' }} action={publish} />
+      <AddressItem title='Package' addresses={packageAddress} setAddress={(addresses) => setPackageAddress(addresses.address)} text='Publish Package' styles={{ marginTop: '40px', wordBreak: 'break-all' }} action={publish} />
 
-      <AddressItem title='Component' addresses={componentAddresses} setAddress={setComponentAddresses} text='Instantiate Component' styles={{ marginTop: '20px', wordBreak: 'break-all' }} action={instantiate} />
+      <AddressItem title='Component' addresses={componentAddress} setAddress={setComponentAddresses} text='Instantiate Component' styles={{ marginTop: '20px', wordBreak: 'break-all' }} action={instantiate} />
 
     </Box>
   );

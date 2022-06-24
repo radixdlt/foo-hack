@@ -1,7 +1,7 @@
 import { DefaultApi, ManifestBuilder } from 'pte-sdk';
 import { getAccountAddress, signTransaction } from 'pte-browser-extension-sdk';
 import { CHESS } from '../address-mappings';
-import { getBadgeFromResources, parsePlayerId } from '../helpers/badge.helpers';
+import { getBadgeFromResources, getPlayerId } from '../helpers/badge.helpers';
 
 const api = new DefaultApi();
 
@@ -33,7 +33,7 @@ const account = {
         return {
             address: accountAddress,
             balances: accountResources,
-            player_id: parsePlayerId({ badge })
+            player_id: getPlayerId({ badge })
         };
 
     },

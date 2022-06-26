@@ -32,11 +32,15 @@ function safeGameMutate(modify, setGameState) {
 
 }
 
-function isSpectator({ userBadge }) {
+function isSpectator({ userBadge, gameInfo }) {
 
   const userId = getPlayerId({ badge: userBadge });
 
-  if (!userId || userId !== gameInfo.player1.player_id && userId !== gameInfo.player2.player_id) {
+  if (!userId) {
+    return true;
+  }
+
+  if (userId !== gameInfo?.player1?.player_id && userId !== gameInfo?.player2?.player_id) {
 
     return true;
 
@@ -46,9 +50,9 @@ function isSpectator({ userBadge }) {
 
 }
 
-function getPlayerRole({ userBadge }) {
+function getPlayerRole({ userBadge, gameInfo }) {
 
-  if (isSpectator({ badge: userBadge })) {
+  if (isSpectator({ userBadge, gameInfo })) {
 
     return {
       role: 'spectator'
@@ -108,4 +112,4 @@ function generateGifClass({ gameResults }) {
 
 }
 
-export { chessboardSetup, safeGameMutate, getGameOutcome, getPlayerRole, generateGifClass, generateResultText };
+export { chessboardSetup, safeGameMutate, getGameOutcome, getPlayerRole, generateGifClass, generateResultText, isSpectator };

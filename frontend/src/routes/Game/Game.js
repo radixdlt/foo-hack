@@ -9,27 +9,27 @@ import { Chess } from 'chess.js';
 import './Game.styles.scss';
 import Header from '../../components/Header';
 import { getPlayerId } from '../../pte-specifics/helpers/badge.helpers';
-import { getGameOutcome, chessboardSetup, generateGifClass, generateResultText } from './Game.utils';
+import { getGameOutcome, chessboardSetup, generateGifClass, generateResultText, isSpectator } from './Game.utils';
 import { getGameInfo } from './Game.requests';
+import { player } from '../../pte-specifics/commands';
+import { onDrop } from './Game.mutators';
 
 function Game() {
 
   const params = useParams();
-
-  if (!params?.gameAddress || params.gameAddress.length < 26) {
-    return <div>Invalid Address.</div>;
-  }
-
   const [gameInfo, setGameInfo] = useState(null);
   const [userBadge, setBadge] = useState(null);
   const [, setGameState] = useState(new Chess());
   const [gameResults, setGameResults] = useState(null);
+  const [infoPoll, setInfoPoll] = useState(null);
 
   useEffect(() => {
 
     setTimeout(() => {
 
-      getBadge();
+      const playerBadge = player.getBadge();
+
+      console.log(playerBadge);
 
     }, 500);
 
@@ -41,9 +41,9 @@ function Game() {
       return;
     }
 
-    const infoPoll = setInterval(() => {
+    setInfoPoll(setInterval(() => {
       getGameInfo({ gameAddress: params.gameAddress }, setGameInfo);
-    }, 5000);
+    }, 5000));
 
     return () => {
       clearInterval(infoPoll);
@@ -61,13 +61,17 @@ function Game() {
 
       setGameResults(getGameOutcome({ gameInfo }));
 
-      if (intervalRef) {
-        clearInterval(intervalRef);
+      if (infoPoll) {
+        clearInterval(infoPoll);
       }
 
     }
 
   }, [gameInfo]);
+
+  if (!params?.gameAddress || params.gameAddress.length < 26) {
+    return <div>Invalid Address.</div>;
+  }
 
   const setup = chessboardSetup({
     creatorId: gameInfo?.player1?.player_id,

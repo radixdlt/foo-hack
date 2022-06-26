@@ -1,3 +1,5 @@
+import { game } from "../../pte-specifics/commands";
+
 function safeGameMutate(modify, setGameState) {
 
   setGameState((state) => {

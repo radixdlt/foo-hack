@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Box, CircularProgress } from '@mui/material';
 
-function Loader({ visible }) {
+function Loader({ children, visible }) {
 
     if (!visible) {
-        return false;
+        return children;
     }
 
     return (

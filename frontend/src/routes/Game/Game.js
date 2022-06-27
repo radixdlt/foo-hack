@@ -9,7 +9,7 @@ import { Chess } from 'chess.js';
 import './Game.styles.scss';
 import Header from '../../components/Header';
 import { getPlayerId } from '../../pte-specifics/helpers/badge.helpers';
-import { getGameOutcome, chessboardSetup, generateGifClass, generateResultText, isSpectator } from './Game.utils';
+import { getGameOutcome, chessboardSetup, generateGifClass, generateResultText, isSpectator } from '../../pte-specifics/helpers/game.helpers';
 import { getGameInfo } from './Game.requests';
 import { player } from '../../pte-specifics/commands';
 import { onDrop } from './Game.mutators';

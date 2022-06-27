@@ -1,4 +1,4 @@
-import { getPlayerId } from "../../pte-specifics/helpers/badge.helpers";
+import { getPlayerId } from "./badge.helpers";
 
 function chessboardSetup({ creatorId, playerId, nicknames }) {
 

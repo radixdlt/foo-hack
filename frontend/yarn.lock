@@ -8889,6 +8889,11 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
+use-async-effect@^2.2.6:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/use-async-effect/-/use-async-effect-2.2.6.tgz#00f2dee71e2f6188c5daf6a067e2bc151f7566b7"
+  integrity sha512-wKUpaHkuF4rzBHawP87o1KzoK2IxJ6De8fUyQ3GN2114zb4zqT87+SEbCHS+F+0inZ2Y+k6Tm1LOCQgYTSD9ww==
+
 util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"

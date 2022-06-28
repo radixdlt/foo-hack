@@ -26,14 +26,13 @@ const account = {
             badgeMapping: CHESS?.game_badge
         });
 
-        if (!badge) {
-            return null;
-        }
-
         return {
             address: accountAddress,
             balances: accountResources,
-            player_id: getPlayerId({ badge })
+            player: {
+                id: getPlayerId({ badge }),
+                badge
+            }
         };
 
     },

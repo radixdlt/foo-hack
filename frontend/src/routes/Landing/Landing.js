@@ -4,15 +4,15 @@ import '../../App.css';
 import { Box, Button } from '@mui/material';
 
 import CreateAccountModal from '../../components/CreateAccountModal';
-import { USER } from '../../pte-specifics/address-mappings';
 import Loader from '../../components/Loader';
 import GameTabs from '../../components/GameTabs';
-import { createGame, submitNickname } from './Landing.requests';
-import { populateGames } from './Landing.mutators';
+import { createGame, createNickname } from './Landing.actions';
+import useAsyncEffect from 'use-async-effect';
+import { account, game } from '../../pte-specifics/commands';
 
 function Landing() {
 
-  const [userBadge, setBadge] = useState(null);
+  const [walletResource, setWalletResource] = useState(null);
   const [games, setGames] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -20,26 +20,23 @@ function Landing() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  useEffect(() => {
+  useAsyncEffect(async isActive => {
 
-    setTimeout(() => {
+    if (modalOpen) return;
 
-      //getBadge();
+    setTimeout(async () => {
+
+      const fetchWalletResource = await account.fetch();
+      if (!isActive()) return;
+      setWalletResource(fetchWalletResource);
+
+      const fetchGames = await game.viewGames();
+      if (!isActive()) return;
+      setGames(fetchGames);
 
     }, 500);
 
-
-  }, []);
-
-  useEffect(() => {
-
-    populateGames(setGames);
-
-    if (!userBadge) {
-      return;
-    }
-
-  }, [userBadge]);
+  }, [modalOpen]);
 
   useEffect(() => {
 
@@ -51,16 +48,19 @@ function Landing() {
 
   return (
     <>
-      <h2 className="header">Welcome to RadiChess!</h2>
+      <h2 className="header">Welcome to FooChess!</h2>
       <div className="constrained-container">
 
         <Loader visible={isLoading}>
-          <Box textAlign="center" marginTop="30px">
-            <Button variant="contained" onClick={handleOpen}>Create Profile</Button>
-          </Box>
-          {!userBadge
-            ? <CreateAccountModal open={modalOpen} handleClose={handleClose} handleSubmit={(val) => submitNickname({ nickname: val, accountAddress: USER.account.address })} />
-            : <GameTabs games={games} userBadge={userBadge} buttonAction={createGame} />
+          {!walletResource?.player?.badge
+            ?
+            <>
+              <Box textAlign="center" marginTop="30px">
+                <Button variant="contained" onClick={handleOpen}>Create Profile</Button>
+              </Box>
+              <CreateAccountModal open={modalOpen} handleClose={handleClose} handleSubmit={(val) => createNickname({ accountAddress: walletResource?.address, nickname: val }, handleClose)} />
+            </>
+            : <GameTabs games={games} userBadge={walletResource?.player?.badge} buttonAction={createGame} />
           }
         </Loader>
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, Tab, Tabs, Button } from '@mui/material';
-import GameList from "./GameList";
+import GameList from "./GameList/GameList";
 import TabPanel from "./TabPanel";
 
 function a11yProps(index) {
@@ -12,35 +12,31 @@ function a11yProps(index) {
 
 function GameTabs({ games, userBadge, buttonAction }) {
 
-    const [value, setValue] = useState(0);
-
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
+    const [currentTab, setCurrentTab] = useState(0);
 
     return (
-        <Box sx={{ width: '100%', margin: 'auto', marginTop: '40px' }}>
+        <Box sx={{ width: '100%', margin: 'auto', marginTop: 4 }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={value} onChange={handleChange} aria-label="RadiChess Menu">
+                <Tabs value={currentTab} onChange={(e, tabIndex) => setCurrentTab(tabIndex)} aria-label="RadiChess Menu">
                     <Tab label="Games in Progress" {...a11yProps(0)} />
                     <Tab label="Join Game" {...a11yProps(1)} />
                     <Tab label="My Games" {...a11yProps(2)} />
                     <Tab label="Results" {...a11yProps(3)} />
                 </Tabs>
             </Box>
-            <TabPanel value={value} index={0}>
+            <TabPanel value={currentTab} index={0}>
                 <GameList games={games} type="InProgress" userBadge={userBadge} />
             </TabPanel>
-            <TabPanel value={value} index={1}>
+            <TabPanel value={currentTab} index={1}>
                 <GameList games={games} type="Awaiting" userBadge={userBadge} />
             </TabPanel>
-            <TabPanel value={value} index={2}>
-                <>
-                    <GameList games={games} type="MyGames" userBadge={userBadge} />
-                    <Button variant="contained" sx={{ marginTop: '20px' }} onClick={buttonAction}>Create New Game</Button>
-                </>
+            <TabPanel value={currentTab} index={2}>
+                <GameList games={games} type="MyGames" userBadge={userBadge} />
+                <Box sx={{ borderTop: 1, borderColor: 'divider', marginTop: 3 }}>
+                    <Button variant="contained" sx={{ marginTop: 3 }} onClick={buttonAction}>Create New Game</Button>
+                </Box>
             </TabPanel>
-            <TabPanel value={value} index={3}>
+            <TabPanel value={currentTab} index={3}>
                 <GameList games={games} type="Finished" userBadge={userBadge} />
             </TabPanel>
         </Box>

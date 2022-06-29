@@ -6,16 +6,28 @@ const api = new DefaultApi();
 
 const game = {
 
-    create: async () => {
+    create: async ({ walletResource }) => {
 
-        const manifest = new ManifestBuilder()
-            .createProofFromAccountByAmount(USER.account.address, '1', USER.account.player_badge)
-            .popFromAuthZone('proof1')
-            .callMethod(CHESS.component, 'start_game', ['Proof("proof1")', '1300u64'])
-            .build()
-            .toString();
+        if (!walletResource) {
+            return null;
+        }
 
-        const receipt = await signTransaction(manifest);
+        try {
+
+            const manifest = new ManifestBuilder()
+                .createProofFromAccountByAmount(walletResource?.address, '1', walletResource?.player?.badge?.resourceAddress)
+                .popFromAuthZone('proof1')
+                .callMethod(CHESS.component, 'start_game', ['Proof("proof1")', '1300u64'])
+                .build()
+                .toString();
+
+            return await signTransaction(manifest);
+
+        } catch {
+
+            return null;
+
+        }
 
     },
 
@@ -30,7 +42,7 @@ const game = {
             transaction: {
                 manifest: manifest,
                 nonce: {
-                    value: Math.round(Math.random()*100000)
+                    value: Math.round(Math.random() * 100000)
                 },
                 signatures: []
             }
@@ -51,7 +63,7 @@ const game = {
             transaction: {
                 manifest: manifest,
                 nonce: {
-                    value: Math.round(Math.random()*1000000) // Scrypto Bug Workaround
+                    value: Math.round(Math.random() * 1000000) // Scrypto Bug Workaround
                 },
                 signatures: []
             }
@@ -61,16 +73,24 @@ const game = {
 
     },
 
-    joinGame: async (gameAddress) => {
+    joinGame: async ({ gameAddress, walletResource }) => {
 
-        const manifest = new ManifestBuilder()
-            .createProofFromAccountByAmount(USER.account.address, '1', USER.account.player_badge)
-            .popFromAuthZone('proof1')
-            .callMethod(gameAddress, 'join', ['Proof("proof1")'])
-            .build()
-            .toString();
+        try {
 
-        const receipt = await signTransaction(manifest);
+            const manifest = new ManifestBuilder()
+                .createProofFromAccountByAmount(walletResource?.address, '1', walletResource?.player?.badge?.resourceAddress)
+                .popFromAuthZone('proof1')
+                .callMethod(gameAddress, 'join', ['Proof("proof1")'])
+                .build()
+                .toString();
+
+            return await signTransaction(manifest);
+
+        } catch {
+
+            return null;
+
+        }
 
     },
 

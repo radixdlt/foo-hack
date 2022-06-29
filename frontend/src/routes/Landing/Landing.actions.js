@@ -1,33 +1,31 @@
 import { game, account } from '../../pte-specifics/commands';
 
-async function getGameInfo({ gameAddress }, callback = false) {
+async function createGame({ walletResource }, onSuccess = null, onFail = null) {
 
-  const gameInfo = await game.getGameInfo(gameAddress);
+  if (!walletResource) {
+    onFail && onFail({ reason: 'No wallet resource was passed through.' });
+  }
 
-  callback && callback(gameInfo);
+  const transaction = await game.create({ walletResource });
 
-  return gameInfo;
+  if (transaction?.status === 'Success') {
+    onSuccess && onSuccess({ transaction });
+  } else {
+    onFail && onFail({ reason: 'Log transaction response.', transaction });
+  }
 
-}
-
-async function createGame({ navigate }) {
-
-  const gameInstance = await game.create();
-
-  console.log(gameInstance);
-
-  //navigate(`/game/${gameInstance.address}`);
+  return transaction;
 
 }
 
-async function createNickname({ accountAddress, nickname }, onSuccess = false, onFail = false) {
+async function createNickname({ accountAddress, nickname }, onSuccess = null, onFail = null) {
 
   const transaction = await account.createBadge({ accountAddress, nickname });
 
   if (transaction?.status === 'Success') {
-    onSuccess && onSuccess(transaction);
+    onSuccess && onSuccess({ transaction });
   } else {
-    onFail && onFail(transaction);
+    onFail && onFail({ reason: 'Log transaction response.', transaction });
   }
 
   return transaction;

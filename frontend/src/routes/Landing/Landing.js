@@ -9,8 +9,11 @@ import GameTabs from '../../components/GameTabs';
 import { createGame, createNickname } from './Landing.actions';
 import useAsyncEffect from 'use-async-effect';
 import { account, game } from '../../pte-specifics/commands';
+import { useNavigate } from 'react-router-dom';
 
 function Landing() {
+
+  const navigate = useNavigate();
 
   const [walletResource, setWalletResource] = useState(null);
   const [games, setGames] = useState(null);
@@ -48,7 +51,7 @@ function Landing() {
 
   return (
     <>
-      <h2 className="header">Welcome to FooChess!</h2>
+      <h2 className="header">Welcome to Party Rock Chess!</h2>
       <div className="constrained-container">
 
         <Loader visible={isLoading}>
@@ -60,7 +63,7 @@ function Landing() {
               </Box>
               <CreateAccountModal open={modalOpen} handleClose={handleClose} handleSubmit={(val) => createNickname({ accountAddress: walletResource?.address, nickname: val }, handleClose)} />
             </>
-            : <GameTabs games={games} userBadge={walletResource?.player?.badge} buttonAction={createGame} />
+            : <GameTabs games={games} userBadge={walletResource?.player?.badge} buttonAction={() => createGame({ walletResource }, ({ transaction }) => navigate(`/game/${transaction.transactionHash}`))} />
           }
         </Loader>
 

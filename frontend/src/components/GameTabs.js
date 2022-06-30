@@ -10,7 +10,7 @@ function a11yProps(index) {
     };
 }
 
-function GameTabs({ games, userBadge, buttonAction }) {
+function GameTabs({ games, walletResource, buttonAction }) {
 
     const [currentTab, setCurrentTab] = useState(0);
 
@@ -25,19 +25,19 @@ function GameTabs({ games, userBadge, buttonAction }) {
                 </Tabs>
             </Box>
             <TabPanel value={currentTab} index={0}>
-                <GameList games={games} type="InProgress" userBadge={userBadge} />
+                <GameList games={games} type="InProgress" walletResource={walletResource} />
             </TabPanel>
             <TabPanel value={currentTab} index={1}>
-                <GameList games={games} type="Awaiting" userBadge={userBadge} />
+                <GameList games={games} type="Awaiting" walletResource={walletResource} />
             </TabPanel>
             <TabPanel value={currentTab} index={2}>
-                <GameList games={games} type="MyGames" userBadge={userBadge} />
+                <GameList games={games} type="MyGames" walletResource={walletResource} />
                 <Box sx={{ borderTop: 1, borderColor: 'divider', marginTop: 3 }}>
                     <Button variant="contained" sx={{ marginTop: 3 }} onClick={buttonAction}>Create New Game</Button>
                 </Box>
             </TabPanel>
             <TabPanel value={currentTab} index={3}>
-                <GameList games={games} type="Finished" userBadge={userBadge} />
+                <GameList games={games} type="Finished" walletResource={walletResource} />
             </TabPanel>
         </Box>
     );

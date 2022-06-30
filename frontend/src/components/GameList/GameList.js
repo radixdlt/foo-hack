@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import GameItem from '../GameItem';
 import { generateEmptyListFallback, listGames } from "./GameList.utils";
 
-function GameList({ games, type, userBadge = null }) {
+function GameList({ games, type, walletResource = null }) {
 
     const navigate = useNavigate();
 
@@ -11,10 +11,10 @@ function GameList({ games, type, userBadge = null }) {
         return null;
     }
 
-    const filteredList = listGames({ games, userBadge, filterType: type });
+    const filteredList = listGames({ games, userBadge: walletResource?.player?.badge, filterType: type });
 
     if (filteredList.length) {
-        return filteredList.map((game) => <GameItem key={game.game_address} game={game} type={type} userBadge={userBadge} navigate={navigate} />);
+        return filteredList.map((game) => <GameItem key={game.game_address} game={game} type={type} navigate={navigate} walletResource={walletResource} />);
     }
 
     return generateEmptyListFallback({ filterType: type });

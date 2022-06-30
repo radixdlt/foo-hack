@@ -1,17 +1,28 @@
 import React from "react";
 import { isSpectator } from "../pte-specifics/helpers/game.helpers";
 import { generateButtonProperties } from "./GameList/GameList.utils";
+import { Button } from '@mui/material';
+import { joinGame, viewGame } from "./GameList/GameList.actions";
 
-function GameItem({ game, type, userBadge, navigate }) {
+function GameItem({ game, type, walletResource, navigate }) {
 
     if (!game) {
         return null;
     }
 
-    const buttonProperties = generateButtonProperties({ gameAddress: game?.game_address, navigate, filterType: type, isSpectator: isSpectator({ userBadge, gameInfo: game }), userBadge });
+    const buttonProperties = generateButtonProperties({
+        actions: {
+            join: () => joinGame({
+                gameAddress: game?.game_address,
+                walletResource
+            }, () => viewGame({ gameAddress: game?.game_address, navigate })),
+            view: () => viewGame({ gameAddress: game?.game_address, navigate })
+        },
+        filterType: type,
+        isSpectator: isSpectator({ userBadge: walletResource?.player?.badge, gameInfo: game })
+    });
 
     return (
-
         <ul className="game-list">
             <li><strong>Game:</strong> {game.game_address}</li>
             <li>
@@ -23,7 +34,7 @@ function GameItem({ game, type, userBadge, navigate }) {
 
             {buttonProperties &&
                 <li>
-                    <div className="view-btn" onClick={buttonProperties.action}>{buttonProperties.text}</div>
+                    <Button variant="outlined" sx={{ marginTop: 2 }} onClick={buttonProperties.action}>{buttonProperties.text}</Button>
                 </li>
             }
 

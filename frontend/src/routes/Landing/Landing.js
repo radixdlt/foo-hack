@@ -63,7 +63,7 @@ function Landing() {
               </Box>
               <CreateAccountModal open={modalOpen} handleClose={handleClose} handleSubmit={(val) => createNickname({ accountAddress: walletResource?.address, nickname: val }, handleClose)} />
             </>
-            : <GameTabs games={games} userBadge={walletResource?.player?.badge} buttonAction={() => createGame({ walletResource }, ({ transaction }) => navigate(`/game/${transaction.transactionHash}`))} />
+            : <GameTabs games={games} walletResource={walletResource} userBadge={walletResource?.player?.badge} buttonAction={() => createGame({ walletResource }, ({ transaction }) => navigate(`/game/${transaction.transactionHash}`))} />
           }
         </Loader>
 

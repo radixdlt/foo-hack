@@ -1,5 +1,4 @@
 import { isSpectator } from "../../pte-specifics/helpers/game.helpers";
-import { joinGame } from "./GameList.actions";
 
 function listGames({ games, userBadge, filterType }) {
 
@@ -21,24 +20,24 @@ function listGames({ games, userBadge, filterType }) {
 
 }
 
-function generateButtonProperties({ gameAddress, navigate, filterType, isSpectator, userBadge }) {
+function generateButtonProperties({ filterType, isSpectator, actions }) {
 
-    if (!filterType || !isSpectator) {
+    if (!filterType) {
         return null;
     }
 
     const text = {
         'InProgress': {
             text: isSpectator ? 'Spectate Game' : 'Continue Game',
-            action: () => navigate(`/game/${gameAddress}`)
+            action: actions.view
         },
         'MyGames': {
             text: 'Continue Game',
-            action: () => navigate(`/game/${gameAddress}`)
+            action: actions.view
         },
         'Awaiting': {
             text: 'Join Game',
-            action: () => joinGame({ gameAddress, userBadge })
+            action: actions.join
         }
     };
 

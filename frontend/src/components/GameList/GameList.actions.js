@@ -1,12 +1,12 @@
 import { game } from "../../pte-specifics/commands";
 
-async function joinGame({ gameAddress, userBadge }, onSuccess = null, onFail = null) {
+async function joinGame({ gameAddress, walletResource }, onSuccess = null, onFail = null) {
 
-    if (!gameAddress || !userBadge) {
+    if (!gameAddress || !walletResource) {
         return null;
     }
 
-    const transaction = await game.joinGame({ gameAddress, userBadge });
+    const transaction = await game.joinGame({ gameAddress, walletResource });
 
     if (transaction?.status === 'Success') {
         onSuccess && onSuccess({ transaction });
@@ -18,4 +18,14 @@ async function joinGame({ gameAddress, userBadge }, onSuccess = null, onFail = n
 
 }
 
-export { joinGame };
+async function viewGame({ gameAddress, navigate }) {
+
+    if (!gameAddress || !navigate) {
+        return null;
+    }
+
+    navigate(`/game/${gameAddress}`);
+
+}
+
+export { joinGame, viewGame };

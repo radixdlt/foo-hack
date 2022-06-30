@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import '../../App.css';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import useAsyncEffect from "use-async-effect";
+import { Box, Button } from "@mui/material";
 
-import { Box, Button } from '@mui/material';
+import { createGame, createNickname } from "./Landing.actions";
+import { account, game } from "../../pte-specifics/commands";
 
-import CreateAccountModal from '../../components/CreateAccountModal';
-import Loader from '../../components/Loader';
-import GameTabs from '../../components/GameTabs';
-import { createGame, createNickname } from './Landing.actions';
-import useAsyncEffect from 'use-async-effect';
-import { account, game } from '../../pte-specifics/commands';
-import { useNavigate } from 'react-router-dom';
+import CreateAccountModal from "../../components/CreateAccountModal";
+import Loader from "../../components/Loader";
+import GameTabs from "../../components/GameTabs";
+import "../../App.css";
+import "./Landing.styles.scss";
 
 function Landing() {
 

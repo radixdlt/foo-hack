@@ -1,7 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import GameItem from '../GameItem';
+
 import { generateEmptyListFallback, listGames } from "./GameList.utils";
+
+import GameItem from "../GameItem/GameItem";
 
 function GameList({ games, type, walletResource = null }) {
 

@@ -1,4 +1,4 @@
-import { game } from '../../pte-specifics/commands';
+import { game } from "../../pte-specifics/commands";
 
 async function getGameInfo({ gameAddress }, callback = false) {
 

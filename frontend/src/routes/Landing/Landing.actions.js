@@ -1,4 +1,4 @@
-import { game, account } from '../../pte-specifics/commands';
+import { game, account } from "../../pte-specifics/commands";
 
 async function createGame({ walletResource }, onSuccess = null, onFail = null) {
 

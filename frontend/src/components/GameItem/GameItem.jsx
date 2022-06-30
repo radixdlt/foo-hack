@@ -1,8 +1,11 @@
 import React from "react";
-import { isSpectator } from "../pte-specifics/helpers/game.helpers";
-import { generateButtonProperties } from "./GameList/GameList.utils";
-import { Button } from '@mui/material';
-import { joinGame, viewGame } from "./GameList/GameList.actions";
+import { Button } from "@mui/material";
+
+import { generateButtonProperties } from "../GameList/GameList.utils";
+import { joinGame, viewGame } from "../GameList/GameList.actions";
+import "./GameItem.styles.scss";
+
+import { isSpectator } from "../../pte-specifics/helpers/game.helpers";
 
 function GameItem({ game, type, walletResource, navigate }) {
 
@@ -23,7 +26,7 @@ function GameItem({ game, type, walletResource, navigate }) {
     });
 
     return (
-        <ul className="game-list">
+        <ul className="game-item">
             <li><strong>Game:</strong> {game.game_address}</li>
             <li>
                 <strong>Player 1:</strong> {game.player1?.nickname} <em>(elo: {game.player1?.elo})</em>

@@ -1,5 +1,6 @@
-import { ManifestBuilder, DefaultApi } from 'pte-sdk';
-import { CHESS } from '../address-mappings';
+import { ManifestBuilder, DefaultApi } from "pte-sdk";
+
+import { CHESS } from "../address-mappings";
 
 const api = new DefaultApi();
 

@@ -1,2 +1,2 @@
-import Component from './Admin';
+import Component from "./Admin";
 export default Component;

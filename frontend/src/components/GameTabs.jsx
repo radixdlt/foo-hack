@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Box, Tab, Tabs, Button } from '@mui/material';
+import { Box, Tab, Tabs, Button } from "@mui/material";
+
 import GameList from "./GameList/GameList";
 import TabPanel from "./TabPanel";
 

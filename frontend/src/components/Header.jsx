@@ -1,6 +1,6 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AppBar, Box, Toolbar, Button } from '@mui/material';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { AppBar, Box, Toolbar, Button } from "@mui/material";
 
 function Header({ backButton = null }) {
 

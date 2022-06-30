@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Box, Button } from '@mui/material';
-import './Admin.styles.scss';
+import React, { useState } from "react";
+import { Box, Button } from "@mui/material";
+import { component, sc_package } from "../../pte-specifics/commands";
 
-import { component, sc_package } from '../../pte-specifics/commands';
+import "./Admin.styles.scss";
 
 let chessPackage = {};
 
@@ -29,7 +29,7 @@ async function instantiate({ packageAddress, setComponentAddress, setBadgeHandle
 
 }
 
-function AddressItem({ children = null, title = '', addresses = null, text = null, generationAction = null }) {
+function AddressItem({ children = null, addresses = null, text = null, generationAction = null }) {
 
   if (generationAction && !addresses) {
 

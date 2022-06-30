@@ -1,2 +1,2 @@
-import Component from './Landing';
+import Component from "./Landing";
 export default Component;

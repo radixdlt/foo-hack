@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AppBar, Box, Toolbar, Button } from '@mui/material';
-import { player } from '../../pte-specifics/commands';
-import '../../App.css';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AppBar, Box, Toolbar, Button } from "@mui/material";
+
+import { player } from "../../pte-specifics/commands";
+import "../../App.css";
 
 
 function ButtonAppBar() {

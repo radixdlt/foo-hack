@@ -5,7 +5,7 @@ function listGames({ games, userBadge, filterType }) {
     if (!games || !userBadge) {
         return null;
     }
-
+   
     return games.filter((gameInfo) => {
 
         if (!isSpectator({ userBadge, gameInfo }) && filterType === 'MyGames') {

@@ -10,19 +10,16 @@ function safeGameMutate(modify, setGameState) {
 
 }
 
-function onDrop({ sourceSquare, targetSquare, gameAddress }, setGameState) {
+function onDrop({ sourceSquare, targetSquare, gameAddress, walletResource }, onSuccess = null, onFail = null) {
+
+  if (!sourceSquare || !targetSquare || !gameAddress || !walletResource) {
+    return false;
+  }
 
   let move = null;
 
   safeGameMutate(async (gameInstance) => {
-
-    // Todo - Re-enable frontend move validation.
-    // Todo - Ensure that piece movement is consistent (don't update state until component response).
-    // Todo - Add the alternate final results.
-    // Todo - Add the rewards / NFT auction mech.
-    // Todo - Customise board and pieces.
-    // Todo - Detect if wallet / account is not present.
-
+    
     // move = gameInstance.move({
     //   from: sourceSquare,
     //   to: targetSquare,
@@ -35,11 +32,12 @@ function onDrop({ sourceSquare, targetSquare, gameAddress }, setGameState) {
 
     // }
 
-    await game.movePiece(gameAddress, sourceSquare, targetSquare);
+    await game.movePiece({ gameAddress, from: sourceSquare, to: targetSquare, walletResource });
 
-  }, setGameState);
+  }, onSuccess);
 
   if (move === null) {
+    onFail && onFail();
     return false;     // illegal move
   }
 

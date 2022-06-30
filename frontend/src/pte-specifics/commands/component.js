@@ -1,5 +1,5 @@
-import { ManifestBuilder } from 'pte-sdk';
-import { signTransaction } from 'pte-browser-extension-sdk';
+import { ManifestBuilder } from "pte-sdk";
+import { signTransaction } from "pte-browser-extension-sdk";
 
 const component = {
 

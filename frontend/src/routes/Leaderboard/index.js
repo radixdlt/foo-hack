@@ -1,2 +1,2 @@
-import Component from './Leaderboard';
+import Component from "./Leaderboard";
 export default Component;

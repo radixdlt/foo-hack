@@ -22,16 +22,6 @@ function chessboardSetup({ creatorId, playerId, nicknames }) {
 
 }
 
-function safeGameMutate(modify, setGameState) {
-
-  setGameState((state) => {
-    const update = { ...state };
-    modify(update);
-    return update;
-  });
-
-}
-
 function isSpectator({ userBadge, gameInfo }) {
 
   const userId = getPlayerId({ badge: userBadge });
@@ -78,8 +68,8 @@ function getGameOutcome({ gameInfo }) {
     return null;
   }
 
-  const hasPlayer1Won = hasPlayerWon({ playerId: gameInfo.player1, winnerId: gameInfo.outcome.Winner });
-  const hasPlayer2Won = hasPlayerWon({ playerId: gameInfo.player2, winnerId: gameInfo.outcome.Winner });
+  const hasPlayer1Won = hasPlayerWon({ playerId: gameInfo?.player1?.player_id, winnerId: gameInfo?.outcome?.Winner });
+  const hasPlayer2Won = hasPlayerWon({ playerId: gameInfo?.player2?.player_id, winnerId: gameInfo?.outcome?.Winner });
 
   return {
     status: !hasPlayer1Won && !hasPlayer2Won ? 'draw' : (hasPlayer1Won || hasPlayer2Won) ? 'concluded' : 'ongoing',
@@ -88,17 +78,17 @@ function getGameOutcome({ gameInfo }) {
 
 }
 
-function generateResultText({ gameResults }) {
+function generateResultText({ gameResults, isSpectator, walletResource }) {
 
   if (!gameResults) {
     return '';
   }
 
-  if (gameResults.current_player_status === 'spectator') {
-    return gameResults.outcome.winner.nickname + ' is the winner!';
-  } else if (gameResults.current_player_status === 'win') {
+  if (isSpectator) {
+    return gameResults?.results?.winner?.nickname + ' is the winner!';
+  } else if (hasPlayerWon({ playerId: walletResource?.player?.id, winnerId: gameResults?.results?.winner?.player_id })) {    
     return 'You Win!';
-  } else if (gameResults.current_player_status === 'loss') {
+  } else {
     return 'You Lose!';
   }
 
@@ -106,10 +96,10 @@ function generateResultText({ gameResults }) {
 
 }
 
-function generateGifClass({ gameResults }) {
+function generateGifClass({ gameResults, isSpectator, walletResource }) {
 
-  return gameResults.current_player_status === 'spectator' ? 'win' : gameResults.current_player_status;
+  return gameResults.status === 'concluded' && isSpectator ? 'win' : hasPlayerWon({ playerId: walletResource?.player?.id, winnerId: gameResults?.results?.winner?.player_id }) ? 'win' : 'loss';
 
 }
 
-export { chessboardSetup, safeGameMutate, getGameOutcome, getPlayerRole, generateGifClass, generateResultText, isSpectator };
+export { chessboardSetup, getGameOutcome, getPlayerRole, generateGifClass, generateResultText, isSpectator };

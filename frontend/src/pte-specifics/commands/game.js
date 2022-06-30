@@ -1,6 +1,7 @@
-import { ManifestBuilder, DefaultApi } from 'pte-sdk';
-import { signTransaction } from 'pte-browser-extension-sdk';
-import { CHESS, USER } from '../address-mappings';
+import { ManifestBuilder, DefaultApi } from "pte-sdk";
+import { signTransaction } from "pte-browser-extension-sdk";
+
+import { CHESS, USER } from "../address-mappings";
 
 const api = new DefaultApi();
 
@@ -94,10 +95,10 @@ const game = {
 
     },
 
-    movePiece: async (gameAddress, from, to) => {
+    movePiece: async ({ gameAddress, from, to, walletResource }) => {
 
         const manifest = new ManifestBuilder()
-            .createProofFromAccountByAmount(USER.account.address, '1', USER.account.player_badge)
+            .createProofFromAccountByAmount(walletResource?.address, '1', walletResource?.player?.badge?.resourceAddress)
             .popFromAuthZone('proof1')
             .callMethod(gameAddress, 'move_piece', [`"${from}"`, `"${to}"`, 'Proof("proof1")'])
             .build()

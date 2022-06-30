@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Box, CircularProgress } from '@mui/material';
+import React from "react";
+import { Box, CircularProgress } from "@mui/material";
 
 function Loader({ children, visible }) {
 

@@ -18,4 +18,4 @@ const USER = {
 
 };
 
-export { CHESS, USER };
+export { CHESS, USER, AUCTION };

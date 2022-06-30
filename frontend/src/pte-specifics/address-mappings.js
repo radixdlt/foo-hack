@@ -12,10 +12,4 @@ const AUCTION = {
 
 };
 
-const USER = {
-
-    account: {}
-
-};
-
-export { CHESS, USER, AUCTION };
+export { CHESS, AUCTION };

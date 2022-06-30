@@ -5,6 +5,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 // Todo - Re-enable frontend move validation.
+// Todo - Turn mech.
 // Todo - Draw functionality and alt gif implementation.
 // Todo - Ensure that piece movement is consistent (don't update state until component response).
 // Todo - Add the alternate final results.

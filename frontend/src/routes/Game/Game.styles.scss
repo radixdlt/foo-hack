@@ -16,7 +16,7 @@
     padding-top: 10px;
     width: 560px;
     height: 560px;
-    background-color: rgba(238,238,238, .9);
+    background-color: rgba(238, 238, 238, 0.9);
     justify-content: center;
     z-index: 10;
     background-position: center center;
@@ -25,31 +25,26 @@
     font-weight: 700;
 
     &.win {
-        background-image: url('../../../public/result-gifs/win.gif');
+        background-image: url("../../../public/result-gifs/win.gif");
 
         &.alt {
-            // alt image here
+            background-image: url("../../../public/result-gifs/win-alt.gif");
         }
-
     }
 
     &.loss {
-        background-image: url('../../../public/result-gifs/lose.gif');
+        background-image: url("../../../public/result-gifs/lose.gif");
 
         &.alt {
-            // alt image here
+            background-image: url("../../../public/result-gifs/lose-alt.gif");
         }
-
     }
 
     &.draw {
-
         //draw image here
 
         &.alt {
             // alt image here
         }
-
     }
-
 }

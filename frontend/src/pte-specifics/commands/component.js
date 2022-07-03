@@ -1,5 +1,5 @@
-import { ManifestBuilder } from 'pte-sdk';
-import { signTransaction } from 'pte-browser-extension-sdk';
+import { ManifestBuilder } from "pte-sdk";
+import { signTransaction } from "pte-browser-extension-sdk";
 
 const component = {
 
@@ -18,7 +18,7 @@ const component = {
             component: receipt.newComponents[0],
             resources: {
                 chess: receipt.newResources[0],
-                player_badge: receipt.newResources[2]
+                game_badge: receipt.newResources[2]
             }
 
         };

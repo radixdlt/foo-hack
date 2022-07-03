@@ -1,6 +1,7 @@
-import { ManifestBuilder } from 'pte-sdk';
-import { signTransaction } from 'pte-browser-extension-sdk';
-import config from '../config';
+import { ManifestBuilder } from "pte-sdk";
+import { signTransaction } from "pte-browser-extension-sdk";
+
+import config from "../config";
 
 const sc_package = {
 

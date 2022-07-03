@@ -1,0 +1,14 @@
+.address-button, .address-text {
+
+    margin-top: 20px !important;
+    word-break: break-all !important;
+
+    &:nth-child(1) {
+        margin-top: 60px !important;
+    }
+
+}
+
+.address-text {
+    font-size: 14px;
+}

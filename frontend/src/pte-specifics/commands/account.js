@@ -1,62 +1,76 @@
-import { DefaultApi, ManifestBuilder } from 'pte-sdk';
-import { getAccountAddress, signTransaction } from 'pte-browser-extension-sdk';
-import mappings from '../address-mappings';
+import { DefaultApi, ManifestBuilder } from "pte-sdk";
+import { getAccountAddress, signTransaction } from "pte-browser-extension-sdk";
+
+import { CHESS } from "../address-mappings";
+import { getBadgeFromResources, getPlayerId } from "../helpers/badge.helpers";
 
 const api = new DefaultApi();
-
-function getBadgeFromBalances({ accountResources }) {
-
-    const badge = accountResources.find(accountResource => {
-        return accountResource.resourceAddress === mappings.player_badge;
-    });
-
-    return badge ?? null;
-
-}
 
 const account = {
 
     fetch: async () => {
+
         const accountAddress = await getAccountAddress();
 
         if (!accountAddress) {
             return null;
         }
 
-        const accountBalances = await account.getBalance(accountAddress);
-        const badge = getBadgeFromBalances({ accountResources: accountBalances.ownedResources });
+        const accountResources = await account.getBalance(accountAddress);
 
-        const userAccount = {
+        if (!accountResources) {
+            return null;
+        }
+
+        const badge = getBadgeFromResources({
+            accountResources: accountResources?.ownedResources,
+            badgeMapping: CHESS?.game_badge
+        });
+
+        return {
             address: accountAddress,
-            balances: accountBalances,
-            player_badge: badge
+            balances: accountResources,
+            player: {
+                id: getPlayerId({ badge }),
+                badge
+            }
         };
-
-        return userAccount;
 
     },
 
     getBalance: async (accountAddress) => {
 
-        return await api.getComponent({
-            address: accountAddress
-        });
+        try {
+
+            return await api.getComponent({
+                address: accountAddress
+            });
+
+        } catch {
+
+            return null;
+
+        }
 
     },
 
     createBadge: async ({ accountAddress, nickname }) => {
-   
-        const manifest = new ManifestBuilder()
-            .callMethod(mappings.component, 'register_player', [`"${nickname}"`, 'Decimal("1300")'])
-            .callMethodWithAllResources(accountAddress, 'deposit_batch')
-            .build()
-            .toString();
 
-            console.log(manifest);
+        try {
 
-        const receipt = await signTransaction(manifest);
+            const manifest = new ManifestBuilder()
+                .callMethod(CHESS.component, 'register_player', [`"${nickname}"`, 'Decimal("1300")'])
+                .callMethodWithAllResources(accountAddress, 'deposit_batch')
+                .build()
+                .toString();
 
-            console.log(receipt)
+            return await signTransaction(manifest);
+
+        } catch {
+
+            return null;
+
+        }
 
     }
 

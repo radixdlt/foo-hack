@@ -1,28 +1,41 @@
-import { ManifestBuilder, DefaultApi } from 'pte-sdk';
-import { signTransaction } from 'pte-browser-extension-sdk';
-import mappings from '../address-mappings';
+import { ManifestBuilder, DefaultApi } from "pte-sdk";
+import { signTransaction } from "pte-browser-extension-sdk";
+
+import { CHESS, USER } from "../address-mappings";
 
 const api = new DefaultApi();
 
 const game = {
 
-    create: async () => {
+    create: async ({ walletResource }) => {
 
-        const manifest = new ManifestBuilder()
-            .createProofFromAccountByAmount(mappings.userAccount.address, '1', mappings.player_badge)
-            .popFromAuthZone('proof1')
-            .callMethod(mappings.component, 'start_game', ['Proof("proof1")', '1300u64'])
-            .build()
-            .toString();
+        if (!walletResource) {
+            return null;
+        }
 
-        const receipt = await signTransaction(manifest);
+        try {
+
+            const manifest = new ManifestBuilder()
+                .createProofFromAccountByAmount(walletResource?.address, '1', walletResource?.player?.badge?.resourceAddress)
+                .popFromAuthZone('proof1')
+                .callMethod(CHESS.component, 'start_game', ['Proof("proof1")', '1300u64'])
+                .build()
+                .toString();
+
+            return await signTransaction(manifest);
+
+        } catch {
+
+            return null;
+
+        }
 
     },
 
     viewGames: async () => {
 
         const manifest = new ManifestBuilder()
-            .callMethod(mappings.component, 'list_games', [])
+            .callMethod(CHESS.component, 'list_games', [])
             .build()
             .toString();
 
@@ -30,7 +43,7 @@ const game = {
             transaction: {
                 manifest: manifest,
                 nonce: {
-                    value: Math.round(Math.random()*100000)
+                    value: Math.round(Math.random() * 100000)
                 },
                 signatures: []
             }
@@ -51,7 +64,7 @@ const game = {
             transaction: {
                 manifest: manifest,
                 nonce: {
-                    value: Math.round(Math.random()*1000000)
+                    value: Math.round(Math.random() * 1000000) // Scrypto Bug Workaround
                 },
                 signatures: []
             }
@@ -61,23 +74,31 @@ const game = {
 
     },
 
-    joinGame: async (gameAddress) => {
+    joinGame: async ({ gameAddress, walletResource }) => {
 
-        const manifest = new ManifestBuilder()
-            .createProofFromAccountByAmount(mappings.userAccount.address, '1', mappings.player_badge)
-            .popFromAuthZone('proof1')
-            .callMethod(gameAddress, 'join', ['Proof("proof1")'])
-            .build()
-            .toString();
+        try {
 
-        const receipt = await signTransaction(manifest);
+            const manifest = new ManifestBuilder()
+                .createProofFromAccountByAmount(walletResource?.address, '1', walletResource?.player?.badge?.resourceAddress)
+                .popFromAuthZone('proof1')
+                .callMethod(gameAddress, 'join', ['Proof("proof1")'])
+                .build()
+                .toString();
+
+            return await signTransaction(manifest);
+
+        } catch {
+
+            return null;
+
+        }
 
     },
 
-    movePiece: async (gameAddress, from, to) => {
+    movePiece: async ({ gameAddress, from, to, walletResource }) => {
 
         const manifest = new ManifestBuilder()
-            .createProofFromAccountByAmount(mappings.userAccount.address, '1', mappings.player_badge)
+            .createProofFromAccountByAmount(walletResource?.address, '1', walletResource?.player?.badge?.resourceAddress)
             .popFromAuthZone('proof1')
             .callMethod(gameAddress, 'move_piece', [`"${from}"`, `"${to}"`, 'Proof("proof1")'])
             .build()

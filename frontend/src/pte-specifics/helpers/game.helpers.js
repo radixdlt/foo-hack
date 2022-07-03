@@ -98,7 +98,9 @@ function generateResultText({ gameResults, isSpectator, walletResource }) {
 
 function generateGifClass({ gameResults, isSpectator, walletResource }) {
 
-  return gameResults.status === 'concluded' && isSpectator ? 'win' : hasPlayerWon({ playerId: walletResource?.player?.id, winnerId: gameResults?.results?.winner?.player_id }) ? 'win' : 'loss';
+  const variant = Math.random() < 0.5 ? ' alt' : '';
+
+  return gameResults.status === 'concluded' && isSpectator ? 'win' : hasPlayerWon({ playerId: walletResource?.player?.id, winnerId: gameResults?.results?.winner?.player_id }) ? 'win'+variant : 'loss'+variant;
 
 }
 

@@ -8,7 +8,8 @@ const CHESS = {
 
 const AUCTION = {
 
-    package: ""
+    package: "",
+    component: ""
 
 };
 

@@ -3,26 +3,39 @@ import { signTransaction } from "pte-browser-extension-sdk";
 
 const component = {
 
-    instantiate: async (address) => {
+    instantiate: async ({ address, auctionPackageAddress }) => {
 
-        const manifest = new ManifestBuilder()
-            .callFunction(address, 'RadiChess', 'create', [])
-            .build()
-            .toString();
+        if (!address || !auctionPackageAddress) {
 
-        // Send manifest to extension for signing
-        const receipt = await signTransaction(manifest);
+            return null;
 
-        return {
+        }
 
-            component: receipt.newComponents[0],
-            resources: {
-                chess: receipt.newResources[0],
-                game_badge: receipt.newResources[2]
-            }
+        try {
 
-        };
+            const manifest = new ManifestBuilder()
+                .callFunction(address, 'RadiChess', 'create', [`"${auctionPackageAddress}"`])
+                .build()
+                .toString();
 
+            // Send manifest to extension for signing
+            const receipt = await signTransaction(manifest);
+
+            return {
+
+                component: receipt.newComponents[0],
+                resources: {
+                    chess: receipt.newResources[0],
+                    game_badge: receipt.newResources[2]
+                }
+
+            };
+
+        } catch {
+
+            return null;
+
+        }
     }
 
 };

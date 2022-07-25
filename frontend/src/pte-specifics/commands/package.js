@@ -1,29 +1,39 @@
 import { ManifestBuilder } from "pte-sdk";
 import { signTransaction } from "pte-browser-extension-sdk";
 
-import config from "../config";
-
 const sc_package = {
 
-    publish: async () => {
+    publish: async ({ localWasmPath = null }) => {
 
-        // Load the wasm
-        const response = await fetch(config.wasm_path);
+        if (!localWasmPath) {
+            return null;
+        }
 
-        const wasm = new Uint8Array(await response.arrayBuffer());
+        try {
 
-        // Construct manifest
-        const manifest = new ManifestBuilder()
-            .publishPackage(wasm)
-            .build()
-            .toString();
+            // Load the wasm
+            const response = await fetch(localWasmPath);
 
-        // Send manifest to extension for signing
-        const receipt = await signTransaction(manifest);
+            const wasm = new Uint8Array(await response.arrayBuffer());
 
-        return {
-            address: receipt.newPackages[0]
-        };
+            // Construct manifest
+            const manifest = new ManifestBuilder()
+                .publishPackage(wasm)
+                .build()
+                .toString();
+
+            // Send manifest to extension for signing
+            const receipt = await signTransaction(manifest);
+
+            return {
+                address: receipt.newPackages[0]
+            };
+
+        } catch {
+
+            return null;
+
+        }
 
     }
 

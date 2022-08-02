@@ -1,8 +1,10 @@
 import React from "react";
 
+import { generateGifClass, generateResultText, isSpectator } from "../../pte-specifics/helpers/game.helpers";
+
 import "./Game.styles.scss";
 
-function ResultImage({ userBadge, gameInfo, gameResults }) {
+function ResultImage({ userBadge, gameInfo, gameResults, walletResource }) {
 
   if (!userBadge) {
     return null;

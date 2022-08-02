@@ -14,6 +14,7 @@ import { account } from "../../pte-specifics/commands";
 
 import Header from "../../components/Header";
 import Loader from "../../components/Loader";
+import ResultImage from "./ResultImage";
 import "./Game.styles.scss";
 
 function Game() {
@@ -91,11 +92,7 @@ function Game() {
           <div className="player-title">{setup.boardTopTitle}</div>
 
           {gameResults &&
-
-            <div className={'result-image ' + generateGifClass({ gameResults, isSpectator: isSpectator({ userBadge: walletResource?.player?.badge, gameInfo }), walletResource })}>
-              <div>{generateResultText({ gameResults, isSpectator: isSpectator({ userBadge: walletResource?.player?.badge, gameInfo }), walletResource })}</div>
-            </div>
-
+            <ResultImage userBadge={walletResource?.player?.badge} walletResource={walletResource} gameInfo={gameInfo} gameResults={gameResults} />
           }
 
           <Chessboard position={gameInfo?.fen ?? ''} onPieceDrop={(sourceSquare, targetSquare) => onDrop({ gameAddress: params.gameAddress, sourceSquare, targetSquare, walletResource }, setGameState)} boardOrientation={setup.orientation} arePiecesDraggable={!isSpectator({ userBadge: walletResource?.player?.badge, gameInfo })} />

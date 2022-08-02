@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box } from "@mui/material";
-import { publishPackage, instantiateChess, instantiateAuction } from "./Admin.actions";
+import { publishPackage,  instantiateComponent } from "./Admin.actions";
 
 import config from "../../pte-specifics/config";
 
@@ -16,11 +16,10 @@ function Admin() {
 
   /* Component Addresses */
   const [gameComponentAddress, setGameComponentAddress] = useState('');
-  const [auctionComponentAddress, setAuctionComponentAddress] = useState('');
 
   /* Badge Handlers */
   const [gameBadgeAddress, setGameBadgeAddress] = useState('');
-  const [auctionAdminBadgeAddress, setAuctionAdminBadgeAddress] = useState('');
+
 
   return (
     <Box sx={{ maxWidth: '300px', display: 'flex', flexDirection: 'column', margin: 'auto', flexWrap: 'wrap' }}>
@@ -34,20 +33,6 @@ function Admin() {
 
       </AddressItem>
 
-      <AddressItem disabled={!auctionPackageAddress} title='Auction Component' addresses={auctionComponentAddress} text='Instantiate Auction Component' generationAction={() => instantiateAuction({ auctionPackageAddress, setAuctionComponentAddress, setAuctionAdminBadgeAddress })}>
-
-        <div className="address-text">
-          <strong>Auction Component Address:</strong>
-          <p>{auctionComponentAddress}</p>
-        </div>
-
-        <div className="address-text">
-          <strong>Auction Admin Badge Handler Address:</strong>
-          <p>{auctionAdminBadgeAddress}</p>
-        </div>
-
-      </AddressItem>
-
       <AddressItem disabled={!auctionPackageAddress} title='Chess Package' addresses={chessPackageAddress} text='Publish Chess Package' generationAction={() => publishPackage({ localWasmPath: config.chess_wasm_path }, setChessPackageAddress)}>
 
         <div className="address-text">
@@ -57,7 +42,7 @@ function Admin() {
 
       </AddressItem>
 
-      <AddressItem disabled={!gameComponentAddress} title='Game Component' addresses={gameComponentAddress} text='Instantiate Game Component' generationAction={() => instantiateChess({ chessPackageAddress, setGameComponentAddress, setGameBadgeAddress })}>
+      <AddressItem disabled={!chessPackageAddress} title='Game Component' addresses={gameComponentAddress} text='Instantiate Game Component' generationAction={() => instantiateComponent('RadiChess', { chessPackageAddress, auctionPackageAddress, setGameComponentAddress, setGameBadgeAddress })}>
 
         <div className="address-text">
           <strong>Chess Component Address:</strong>

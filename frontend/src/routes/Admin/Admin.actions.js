@@ -11,9 +11,9 @@ async function publishPackage({ localWasmPath }, onSuccess) {
 
 }
 
-async function instantiateChess({ chessPackageAddress, auctionPackageAddress, setGameComponentAddress, setGameBadgeAddress }) {
+async function instantiateComponent(componentName, { chessPackageAddress, auctionPackageAddress, setGameComponentAddress, setGameBadgeAddress }) {
 
-  const instance = await component.instantiate({ address: chessPackageAddress, auctionPackageAddress });
+  const instance = await component.instantiate(componentName, { chessPackageAddress, auctionPackageAddress });
   console.log('Component Instantiated.');
 
   setGameComponentAddress(instance?.component || 'Error.');
@@ -23,16 +23,4 @@ async function instantiateChess({ chessPackageAddress, auctionPackageAddress, se
 
 }
 
-async function instantiateAuction({ auctionPackageAddress, setAuctionComponentAddress, setAuctionAdminBadgeAddress }) {
-
-  const instance = await component.instantiate(auctionPackageAddress);
-  console.log('Component Instantiated.');
-
-  setAuctionComponentAddress(instance?.component || 'Error.');
-  setAuctionAdminBadgeAddress(instance?.resources?.admin_badge_address || 'Error.');
-
-  return instance;
-
-}
-
-export { publishPackage, instantiateChess, instantiateAuction };
+export { publishPackage, instantiateComponent };

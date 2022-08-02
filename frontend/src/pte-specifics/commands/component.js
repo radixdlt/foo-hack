@@ -3,18 +3,18 @@ import { signTransaction } from "pte-browser-extension-sdk";
 
 const component = {
 
-    instantiate: async ({ address, auctionPackageAddress }) => {
+    instantiate: async (componentName, { chessPackageAddress, auctionPackageAddress }) => {
 
-        if (!address || !auctionPackageAddress) {
+        if (!chessPackageAddress || !auctionPackageAddress) {
 
             return null;
 
         }
 
         try {
-
+            
             const manifest = new ManifestBuilder()
-                .callFunction(address, 'RadiChess', 'create', [`"${auctionPackageAddress}"`])
+                .callFunction(chessPackageAddress, componentName, 'create', [`"${auctionPackageAddress}"`])
                 .build()
                 .toString();
 
@@ -26,7 +26,8 @@ const component = {
                 component: receipt.newComponents[0],
                 resources: {
                     chess: receipt.newResources[0],
-                    game_badge: receipt.newResources[2]
+                    game_badge: receipt.newResources[2],
+                    auction: receipt.newResources[3]
                 }
 
             };

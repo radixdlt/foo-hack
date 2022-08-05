@@ -5,6 +5,21 @@ import { AppBar, Box, Toolbar, Button } from "@mui/material";
 import { player } from "../../pte-specifics/commands";
 import "../../App.css";
 
+function sortPlayers(players) {
+
+  if (!players || players.length < 1) {
+    return null;
+  }
+
+  return players.sort((a, b) => {
+    if (parseInt(a.elo) < parseInt(b.elo)) {
+      return 1
+    } else {
+      return -1
+    }
+  });
+
+}
 
 function ButtonAppBar() {
 
@@ -52,16 +67,8 @@ function Leaderboard() {
 
     const players = await player.listPlayers();
 
-    players = players.sort(function (a, b) {
-      if (parseInt(a.elo) < parseInt(b.elo)) {
-        return 1
-      } else {
-        return -1
-      }
+    setPlayers(sortPlayers(players));
 
-    });
-
-    setPlayers(players);
   }
 
   useEffect(() => {
@@ -71,6 +78,7 @@ function Leaderboard() {
       getPlayers();
 
     }, 200);
+
   }, []);
 
   return (

@@ -16,7 +16,6 @@ blueprint! {
         highest_bid_id:Option<NonFungibleId>,
         admin_badge_address:ResourceAddress,
         auction_end_epoch:u64
-
     }
 
     impl Auction {
@@ -135,10 +134,13 @@ blueprint! {
 
 
             return self.bid_vault.take(nft_payment)
-
-
-
         }
-    
+
+        pub fn get_status(&self) -> String {
+            match self.auction_end_epoch <= Runtime::current_epoch() {
+                true => "InProgress",
+                false => "Finished",
+            }
+        }
     }
 }

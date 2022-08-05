@@ -41,6 +41,7 @@ pub struct GameJSON {
     player2: Option<Player>,
     fen: Option<String>,
     player_turn: Option<String>,
+    auction_address: Option<String>,
 }
 
 impl GameJSON {
@@ -51,7 +52,8 @@ impl GameJSON {
         player1: Player,
         player2: Option<Player>,
         fen: Option<String>,
-        player_turn: Option<String>
+        player_turn: Option<String>,
+        auction_address: Option<String>,
     ) -> Self {
         Self {
             game_address,
@@ -60,7 +62,8 @@ impl GameJSON {
             player1,
             player2,
             fen,
-            player_turn
+            player_turn,
+            auction_address
         }
     }
 }
@@ -198,7 +201,8 @@ blueprint! {
                         ),
                         player2_details,
                         None,
-                        None
+                        None,
+                        component.get_auction_address()
                     )
                 })
                 .collect::<Vec<GameJSON>>();

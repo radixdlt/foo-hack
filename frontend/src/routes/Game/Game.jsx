@@ -9,7 +9,7 @@ import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
 
 import { getPlayerId } from "../../pte-specifics/helpers/badge.helpers";
-import { getGameOutcome, chessboardSetup, generateGifClass, generateResultText, isSpectator } from "../../pte-specifics/helpers/game.helpers";
+import { getGameOutcome, chessboardSetup, isSpectator } from "../../pte-specifics/helpers/game.helpers";
 import { account } from "../../pte-specifics/commands";
 
 import Header from "../../components/Header";

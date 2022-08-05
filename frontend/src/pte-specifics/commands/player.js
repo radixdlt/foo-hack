@@ -8,22 +8,30 @@ const player = {
 
     listPlayers: async () => {
 
-        const manifest = new ManifestBuilder()
-            .callMethod(CHESS.component, 'list_players', [])
-            .build()
-            .toString();
+        try {
 
-        const results = await api.submitTransaction({
-            transaction: {
-                manifest: manifest,
-                nonce: {
-                    value: Math.round(Math.random() * 100000)
-                },
-                signatures: []
-            }
-        });
+            const manifest = new ManifestBuilder()
+                .callMethod(CHESS.component, 'list_players', [])
+                .build()
+                .toString();
 
-        return JSON.parse(JSON.parse(results.outputs[0]).value);
+            const results = await api.submitTransaction({
+                transaction: {
+                    manifest: manifest,
+                    nonce: {
+                        value: Math.round(Math.random() * 100000)
+                    },
+                    signatures: []
+                }
+            });
+
+            return JSON.parse(JSON.parse(results.outputs[0]).value);
+
+        } catch {
+
+            return null;
+
+        }
 
     }
 

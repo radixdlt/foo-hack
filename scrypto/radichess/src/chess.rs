@@ -154,6 +154,8 @@ blueprint! {
                 }
             };
 
+            let auction_address = self.get_auction_address();
+
             let game = GameJSON::new(
                 Runtime::actor().component_address().unwrap().to_string(),
                 self.get_outcome(),
@@ -165,7 +167,8 @@ blueprint! {
                 ),
                 player2_details,
                 Some(self.get_fen()),
-                player_turn
+                player_turn,
+                auction_address
             );
 
             serde_json_wasm::to_string(&game).unwrap()
@@ -399,6 +402,13 @@ blueprint! {
                 self.player1_id.to_string()
             } else {
                 self.player2_id.clone().unwrap().to_string()
+            }
+        }
+
+        pub fn get_auction_address(&self) -> Option<String> {
+            match self.auction_component {
+                Some(v) => Some(v.to_string()),
+                None => None,
             }
         }
     }
